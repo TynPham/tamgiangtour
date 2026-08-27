@@ -28,6 +28,7 @@ The route is complete when the V1 feature sequence, product contracts, content i
 - [Choose the V1 editable content boundary](issues/04-choose-v1-editable-content-boundary.md): Assigned localized editorial copy to Markdown/MDX, canonical single-tour facts and curated social proof to small typed repository sources, and visitor-generated enquiries alone to Supabase persistence.
 - [Prototype the V1 mobile sales journey and page boundaries](issues/05-prototype-mobile-sales-journey.md): Reduced V1 to Home, Tour Detail, and Contact; embedded supporting content in the relevant decision path; and defined the mobile order, CTA hierarchy, recovery paths, and accessibility contract without V1.1 patterns.
 - [Define V1 measurement and acquisition attribution](issues/06-define-v1-measurement-and-attribution.md): Limited PostHog to eight consent-gated custom events and normalized non-PII properties, with optional current-visit attribution on enquiries and operational notification diagnostics kept separate.
+- [Set the V1 launch gates and future test seams](issues/07-set-v1-launch-gates-and-test-seams.md): Defined observable Vietnamese mobile, content, enquiry, notification, trust, analytics, SEO, and accessibility gates plus focused Vitest, Playwright, and manual verification seams.
 
 ## Not yet specified
 
