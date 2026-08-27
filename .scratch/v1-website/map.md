@@ -24,6 +24,7 @@ The route is complete when the V1 feature sequence, product contracts, content i
 
 - [Approve the V1 launch inputs](issues/01-approve-v1-launch-inputs.md): Classified the real V1 sources, explicit launch blockers, optional omissions, and the two-role approval/evidence model without inventing missing facts.
 - [Define the V1 locale and content contract](issues/02-define-bilingual-url-and-content-contract.md): Made Vietnamese the sole V1 launch language while preserving explicit, approval-driven `/en` localization without fallback or launch blocking.
+- [Define the V1 booking enquiry contract](issues/03-define-booking-enquiry-contract.md): Defined the minimal enquiry fields, server-authoritative validation, durable-storage success boundary, manual operator handoff, idempotent retries, lightweight abuse controls, and Ticket 06-owned acquisition context without introducing booking-system behavior.
 
 ## Not yet specified
 
