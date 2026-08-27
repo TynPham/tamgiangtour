@@ -39,7 +39,7 @@ The website should not be just a brochure. It should support the customer journe
 
 V1 is Vietnamese-first. Vietnamese travelers are the primary launch audience; international-specific channels and operations must not drive V1 requirements.
 
-This does not by itself remove Vietnamese/English support. Ticket 02 in the V1 Wayfinder map decides whether English remains required for V1, becomes secondary, or moves to a later milestone.
+Vietnamese is the only language that determines V1 launch readiness. English is secondary and non-blocking: the site remains localization-ready, but incomplete or unapproved English pages are neither public nor indexable.
 
 ---
 
@@ -379,7 +379,7 @@ Generate real leads and booking requests.
 - Phone CTA.
 - Simple booking enquiry form.
 - Booking submission confirmation.
-- Vietnamese and English.
+- Approved Vietnamese content, with a localization-ready structure for later English content.
 - Basic tracking.
 
 ### Not Needed Yet
@@ -585,7 +585,8 @@ Possible features:
 | Google Maps | Very High | V1 |
 | Reviews | Very High | V1 |
 | Mobile UX | Very High | V1 |
-| Vietnamese / English | High | V1 |
+| Vietnamese | High | V1 |
+| English | Secondary, non-blocking | Later when approved |
 | Source attribution | High | V1–V1.1 |
 | SEO | High | V1–V1.1 |
 | PWA | Medium | V1.5 |
@@ -748,7 +749,7 @@ Do not build early:
 - [ ] Basic tracking exists.
 - [ ] Real photos exist.
 - [ ] Reviews/social proof exist.
-- [ ] English version is usable.
+- [ ] Required Vietnamese content is complete and usable.
 
 ## V1.5
 
