@@ -9,10 +9,6 @@ Which real business facts and publishable assets are approved as V1 sources of t
 
 Record ownership and approval state, not placeholder copy. Distinguish a missing launch blocker from content that can legitimately be omitted from V1.
 
-## Comments
-
-- V1 is Vietnamese-first. Phone and Zalo are required contact channels; WhatsApp is optional and must not block launch. This does not decide whether English remains required, becomes secondary, or moves to a later milestone.
-
 ## Answer
 
 The V1 launch-input inventory is resolved. Resolution means every reviewed input is classified with explicit approval boundaries; it does **not** mean the currently missing launch content is approved.
@@ -30,7 +26,7 @@ Approval must be recorded in project artifacts and must not be inferred from an 
 
 ### Approved and ready to publish
 
-- **Audience/channel scope**: V1 is Vietnamese-first. Phone and Zalo are required; WhatsApp is optional and not a launch blocker. This does not decide Ticket 02's VI/EN scope.
+- **Audience/channel scope**: V1 is Vietnamese-first. Phone and Zalo are required; WhatsApp is optional and not a launch blocker. English remains localization-ready but does not determine launch readiness.
 - **Phone**: `0332 279 474`; it supersedes the old promotional-banner number.
 - **Maps place label**: `Tour Du Lịch Phá Tam Giang - Chú Huyền`.
 - **Google Maps destination**: [verified place](https://www.google.com/maps/place/Tour+Du+l%E1%BB%8Bch+Ph%C3%A1+Tam+Giang+-+Ch%C3%BA+Huy%E1%BB%81n/@16.6284417,107.5057473,17.94z/data=!4m6!3m5!1s0x31410f0d57c95e1d:0x559dd7c2099bd6dd!8m2!3d16.6278753!4d107.5060075!16s%2Fg%2F11zf720lcw?hl=en&entry=ttu) at `16.6278753, 107.5060075`. Approval of this place does not yet prove it is the normal boarding pier.
@@ -74,7 +70,6 @@ Approval must be recorded in project artifacts and must not be inferred from an 
 - Original-media inventory and publication/consent verification for a sufficient real V1 photo set. No stock image may impersonate the family or guest experience.
 - At least one verified attributable source of real reviews/social proof before public launch. Development may proceed without it.
 - Final Vietnamese price, exclusions, safety, policy/enquiry, family-story, FAQ, CTA, and submission-confirmation copy; remaining promotional copy also needs approval.
-- English launch copy and fluent-human review only if Ticket 02 retains English in V1.
 - Named product/website and operational approvers.
 
 ### Optional and safe to omit from V1
@@ -87,7 +82,12 @@ Approval must be recorded in project artifacts and must not be inferred from an 
 - Short-form website video.
 - Identifiable guest imagery when consent is unavailable.
 - Specific seafood species, Ru Cha, or lagoon-hut promises unless later operationally approved.
+- Approved English customer-facing copy for V1 launch; English is secondary and non-blocking.
 
 ### Source-copy status
 
-No complete Vietnamese page copy is launch-ready. Existing Vietnamese banner language is draft material except where an underlying fact above is independently approved. No professionally approved or fluent-human-reviewed English copy is recorded; Ticket 02 owns whether English assets must become launch-ready.
+No complete Vietnamese page copy is launch-ready. Existing Vietnamese banner language is draft material except where an underlying fact above is independently approved. No professionally approved or fluent-human-reviewed English copy is recorded; Ticket 02 established that this does not block V1 launch.
+
+## Comments
+
+- V1 is Vietnamese-first. Phone and Zalo are required contact channels; WhatsApp is optional and must not block launch. Ticket 02 later established that English is secondary and non-blocking.
