@@ -26,6 +26,7 @@ The route is complete when the V1 feature sequence, product contracts, content i
 - [Define the V1 locale and content contract](issues/02-define-bilingual-url-and-content-contract.md): Made Vietnamese the sole V1 launch language while preserving explicit, approval-driven `/en` localization without fallback or launch blocking.
 - [Define the V1 booking enquiry contract](issues/03-define-booking-enquiry-contract.md): Defined the minimal enquiry fields, server-authoritative validation, durable-storage success boundary, manual operator handoff, idempotent retries, lightweight abuse controls, and Ticket 06-owned acquisition context without introducing booking-system behavior.
 - [Choose the V1 editable content boundary](issues/04-choose-v1-editable-content-boundary.md): Assigned localized editorial copy to Markdown/MDX, canonical single-tour facts and curated social proof to small typed repository sources, and visitor-generated enquiries alone to Supabase persistence.
+- [Prototype the V1 mobile sales journey and page boundaries](issues/05-prototype-mobile-sales-journey.md): Reduced V1 to Home, Tour Detail, and Contact; embedded supporting content in the relevant decision path; and defined the mobile order, CTA hierarchy, recovery paths, and accessibility contract without V1.1 patterns.
 
 ## Not yet specified
 
