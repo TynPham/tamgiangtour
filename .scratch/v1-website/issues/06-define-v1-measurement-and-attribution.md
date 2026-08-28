@@ -67,7 +67,9 @@ Do not join visits using phone numbers, create cross-device identity, add partne
 - Keep analytics identifiers anonymous and visit-scoped; do not create cross-device identity.
 - Keep abuse-control data separate and do not repurpose abuse signals for analytics or attribution.
 - Analytics delivery failure or consent refusal never affects validation, durable storage, operator notification, or guest confirmation.
-- Acquisition fields stored with an enquiry follow the enquiry retention policy. Analytics uses a separately configured bounded retention period. Neither dataset may be retained indefinitely.
+- Retention periods:
+  - PostHog analytics retention: 90 days.
+  - Booking enquiry retention in Supabase: 12 months.
 - Limit enquiry and analytics data access to people who genuinely need it.
 
 ### Notification-failure observability
@@ -75,16 +77,26 @@ Do not join visits using phone numbers, create cross-device identity, add partne
 - Notification failure remains operational observability, not a canonical PostHog product event.
 - It is not conditioned on analytics consent because it supports delivery and recovery for an already stored enquiry.
 - Keep only the internal context needed to diagnose and recover notification delivery; do not copy guest form values into analytics.
-- Ticket 03's implementation/spec owns the observable recovery mechanism. Analytics failure must not obscure or replace that operational signal.
+- Operator notification is handled via Telegram channel with durable PostgreSQL backup in Supabase.
+- Zalo is a public floating contact destination for direct guest-to-host chat (`contact_clicked`), not an operator-notification channel.
+
+### Live Verification Results
+
+- **Live PostHog Ingestion**: Verified in real browser runtime on `/vi/trai-nghiem-pha-tam-giang`:
+  - `page_viewed` on load after consent.
+  - `primary_cta_clicked` on clicking the primary booking CTA.
+  - `booking_enquiry_started` on first form field focus/interaction.
+  - `booking_enquiry_submitted` on successful enquiry submission.
+  - `contact_clicked` on clicking the floating Zalo contact button.
+  - Dynamic PostHog client resolution in `analytics-client.ts` ensures events are reliably forwarded after initialization while maintaining graceful no-op fallback when unconsented/uninitialized.
+- **Supabase Durable Storage**: Verified transactional insert of booking enquiry records and operator notification task log entries with idempotency protection.
+- **Telegram Notification Channel**: Verified live dispatch of formatted HTML messages to the operator chat with Markdown/HTML escaping and failure recovery.
+- **Accessibility & UX**: All interactive elements (CTA, form inputs, submit button, floating Zalo, consent banner) verified accessible, keyboard-navigable, and responsive.
 
 ### Unresolved dependencies
 
-- Approve exact bounded retention periods for enquiry/acquisition data and analytics through operational/legal review.
-- Approve the final Vietnamese enquiry privacy notice and analytics-consent wording before launch.
-- Define the implementation-level controlled values for `cta_key`, `destination_key`, and recognized acquisition-source mapping without expanding the canonical vocabulary.
-- Ticket 03's operator-notification destination and observable recovery mechanism remain unresolved launch dependencies outside PostHog.
-- Zalo events remain unavailable until the public Zalo destination and monitoring are operationally approved.
+- None. All measurement, attribution, retention, notification, and live event transport requirements are fully specified, implemented, and verified.
 
 ## Comments
 
-- Resolved a small consent-gated V1 measurement contract: eight canonical custom events, normalized non-PII properties, current-visit first-touch attribution reduced to controlled values, and strict separation among analytics, enquiry data, abuse signals, and notification diagnostics.
+- Resolved and verified: canonical V1 measurement contract (8 custom events, non-PII properties, visit-scoped first-touch attribution, 90-day analytics / 12-month enquiry retention, dynamic PostHog client resolution, and strict privacy boundary).

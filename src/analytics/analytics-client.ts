@@ -1,6 +1,5 @@
 import type {
   BookingEnquiryAnalyticsEvent,
-  BookingEnquiryFieldName,
 } from "@/src/booking-enquiries/booking-enquiry-contract";
 import type {
   CanonicalAnalyticsEvent,
@@ -16,13 +15,12 @@ export type AnalyticsSink = (
   properties: Record<string, unknown>,
 ) => void;
 
-function defaultPostHogSink(): AnalyticsSink | null {
-  if (typeof window !== "undefined" && (window as unknown as { posthog?: { capture?: AnalyticsSink } }).posthog?.capture) {
+import posthog from "posthog-js";
+
+function getPostHogSink(): AnalyticsSink | null {
+  if (typeof window !== "undefined" && typeof posthog?.capture === "function") {
     return (eventName, properties) => {
-      (window as unknown as { posthog: { capture: AnalyticsSink } }).posthog.capture(
-        eventName,
-        properties,
-      );
+      posthog.capture(eventName, properties);
     };
   }
   return null;
@@ -56,22 +54,35 @@ export interface AnalyticsTracker {
 }
 
 export function createAnalyticsTracker({
-  sink = defaultPostHogSink(),
+  sink,
+  getSink,
   checkConsent = () => hasAnalyticsConsent(),
 }: {
   sink?: AnalyticsSink | null;
+  getSink?: () => AnalyticsSink | null;
   checkConsent?: () => boolean;
 } = {}): AnalyticsTracker {
+  function resolveSink(): AnalyticsSink | null {
+    if (sink !== undefined) {
+      return sink;
+    }
+    if (getSink) {
+      return getSink();
+    }
+    return getPostHogSink();
+  }
+
   function track(event: CanonicalAnalyticsEvent): void {
     try {
       if (!checkConsent()) {
         return;
       }
-      if (!sink) {
+      const activeSink = resolveSink();
+      if (!activeSink) {
         return;
       }
 
-      sink(event.name, event.properties);
+      activeSink(event.name, event.properties);
     } catch {
       // Analytics failure must never affect browsing, contact, or enquiry submission.
     }

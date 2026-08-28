@@ -149,4 +149,43 @@ describe("AnalyticsTracker", () => {
       tracker.trackContact("phone", "tour_detail", "vi");
     }).not.toThrow();
   });
+
+  it("tracker created before PostHog initialization can still send after PostHog becomes available", () => {
+    let activeSink: ((eventName: string, properties: Record<string, unknown>) => void) | null = null;
+
+    // Tracker created early (e.g. at module load time when PostHog is null)
+    const tracker = createAnalyticsTracker({
+      getSink: () => activeSink,
+      checkConsent: () => true,
+    });
+
+    // Tracking before PostHog initializes
+    tracker.trackPageView("tour_detail", "vi");
+
+    // PostHog initializes later
+    const dynamicSinkMock = vi.fn();
+    activeSink = dynamicSinkMock;
+
+    // Subsequent tracking succeeds
+    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_section", "tour_detail", "vi");
+    expect(dynamicSinkMock).toHaveBeenCalledTimes(1);
+    expect(dynamicSinkMock).toHaveBeenCalledWith("primary_cta_clicked", {
+      cta_key: "enquiry_start",
+      destination_key: "booking_enquiry_section",
+      page_key: "tour_detail",
+      locale: "vi",
+    });
+  });
+
+  it("missing or unavailable PostHog remains a silent no-op", () => {
+    const tracker = createAnalyticsTracker({
+      getSink: () => null,
+      checkConsent: () => true,
+    });
+
+    expect(() => {
+      tracker.trackPageView("tour_detail", "vi");
+      tracker.trackContact("zalo", "tour_detail", "vi");
+    }).not.toThrow();
+  });
 });
