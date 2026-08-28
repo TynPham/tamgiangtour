@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { ArrowDown, Waves } from "lucide-react";
+import { Waves } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { BookingEnquirySection } from "@/src/booking-enquiries/booking-enquiry-section";
 import {
   VIETNAMESE_BOOKING_ENQUIRY_COPY,

@@ -1,31 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 import { Button } from "@/components/ui/button";
 import { getAnalyticsConsent, setAnalyticsConsent, type AnalyticsConsent } from "@/src/analytics/consent";
 
+function subscribe(callback: () => void) {
+  window.addEventListener("tamgiang:consent_changed", callback);
+  return () => {
+    window.removeEventListener("tamgiang:consent_changed", callback);
+  };
+}
+
+function getSnapshot(): AnalyticsConsent {
+  return getAnalyticsConsent();
+}
+
+function getServerSnapshot(): AnalyticsConsent {
+  return "granted";
+}
+
 export function AnalyticsConsentBanner() {
-  const [consentState, setConsentState] = useState<AnalyticsConsent>("granted"); // default to granted temporarily to prevent SSR layout flash, then check in useEffect
-  const [mounted, setMounted] = useState(false);
+  const consentState = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-  useEffect(() => {
-    setMounted(true);
-    setConsentState(getAnalyticsConsent());
-
-    const handleConsentChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ consent: AnalyticsConsent }>;
-      if (customEvent.detail?.consent) {
-        setConsentState(customEvent.detail.consent);
-      }
-    };
-
-    window.addEventListener("tamgiang:consent_changed", handleConsentChange);
-    return () => {
-      window.removeEventListener("tamgiang:consent_changed", handleConsentChange);
-    };
-  }, []);
-
-  if (!mounted || consentState !== "pending") {
+  if (consentState !== "pending") {
     return null;
   }
 
