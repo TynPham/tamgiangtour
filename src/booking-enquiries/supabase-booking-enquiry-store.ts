@@ -50,6 +50,8 @@ export function createSupabaseBookingEnquiryStore(
         p_requested_tour_date: input.requestedTourDate,
         p_source_page: input.sourcePage,
         p_total_guest_count: input.totalGuestCount,
+        p_landing_page_key: input.landingPageKey ?? null,
+        p_acquisition_source: input.acquisitionSource ?? null,
       });
 
       const row = Array.isArray(data) ? data[0] : undefined;

@@ -70,6 +70,8 @@ export function ZaloIcon({ className = "size-6" }: { className?: string }) {
   );
 }
 
+import { analytics } from "@/src/analytics/analytics-client";
+
 export function FloatingZaloButton({
   href = VIETNAMESE_ZALO_CONTACT.href,
   ariaLabel = VIETNAMESE_ZALO_CONTACT.ariaLabel,
@@ -85,6 +87,7 @@ export function FloatingZaloButton({
         href,
       });
     }
+    analytics.trackContact("zalo", "tour_detail", "vi");
     onClick?.(event);
   };
 

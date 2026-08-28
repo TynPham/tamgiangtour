@@ -23,6 +23,18 @@ const submissionSchema = z
     locale: z.enum(["vi", "en"]),
     sourcePage: z.literal("tour_detail"),
     website: z.string().optional(),
+    landingPageKey: z.enum(["home", "tour_detail", "contact"]).optional(),
+    acquisitionSource: z
+      .enum([
+        "direct",
+        "google_search",
+        "google_maps",
+        "facebook",
+        "tiktok",
+        "other_referrer",
+        "unknown",
+      ])
+      .optional(),
   })
   .strict();
 
@@ -36,6 +48,16 @@ export type PersistBookingEnquiryInput = {
   guestNotes: string | null;
   locale: "vi" | "en";
   sourcePage: "tour_detail";
+  landingPageKey?: "home" | "tour_detail" | "contact" | null;
+  acquisitionSource?:
+    | "direct"
+    | "google_search"
+    | "google_maps"
+    | "facebook"
+    | "tiktok"
+    | "other_referrer"
+    | "unknown"
+    | null;
 };
 
 export type PersistBookingEnquiryResult =
@@ -162,6 +184,8 @@ export function createBookingEnquiryHandler({
       guestNotes: fields.guestNotes ?? null,
       locale: parsed.data.locale,
       sourcePage: parsed.data.sourcePage,
+      landingPageKey: parsed.data.landingPageKey ?? null,
+      acquisitionSource: parsed.data.acquisitionSource ?? null,
     } satisfies Omit<PersistBookingEnquiryInput, "payloadFingerprint">;
 
     try {
