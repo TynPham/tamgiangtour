@@ -248,4 +248,91 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
     const dateInput = page.locator('input[name="requestedTourDate"]');
     await expect(dateInput).toBeFocused();
   });
+
+  test("analytics consent banner grants consent and attaches controlled attribution to submission", async ({
+    page,
+  }) => {
+    let capturedPayload: unknown = null;
+    await page.route("**/api/booking-enquiries", async (route) => {
+      capturedPayload = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ outcome: "recorded", replayed: false }),
+      });
+    });
+
+    await page.goto(`${TOUR_DETAIL_PATH}?utm_source=google&utm_campaign=summer_sale`);
+
+    // Verify consent banner appears
+    const banner = page.locator('[role="region"][aria-label="Tùy chọn quyền riêng tư"]');
+    await expect(banner).toBeVisible();
+
+    // Click "Đồng ý"
+    const acceptBtn = banner.getByRole("button", { name: "Đồng ý" });
+    await acceptBtn.click();
+    await expect(banner).not.toBeVisible();
+
+    // Submit valid form
+    await page.fill('input[name="requestedTourDate"]', validFormData.date);
+    await page.fill('input[name="totalGuestCount"]', validFormData.guests);
+    await page.fill('input[name="guestName"]', validFormData.name);
+    await page.fill('input[name="phoneNumber"]', validFormData.phone);
+
+    await page.getByRole("button", { name: "Gửi yêu cầu đặt trải nghiệm" }).click();
+    await expect(page.getByRole("status")).toContainText("Đã ghi nhận yêu cầu của bạn");
+
+    // Attribution is normalized and contains NO raw UTM parameters
+    expect(capturedPayload).toMatchObject({
+      landingPageKey: "tour_detail",
+      acquisitionSource: "google_search",
+    });
+    expect(capturedPayload).not.toHaveProperty("utm_campaign");
+  });
+
+  test("denying analytics consent leaves attribution absent on submission", async ({
+    page,
+  }) => {
+    let capturedPayload: unknown = null;
+    await page.route("**/api/booking-enquiries", async (route) => {
+      capturedPayload = route.request().postDataJSON();
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ outcome: "recorded", replayed: false }),
+      });
+    });
+
+    await page.goto(`${TOUR_DETAIL_PATH}?utm_source=google`);
+
+    // Click "Từ chối"
+    const banner = page.locator('[role="region"][aria-label="Tùy chọn quyền riêng tư"]');
+    await expect(banner).toBeVisible();
+    await banner.getByRole("button", { name: "Từ chối" }).click();
+    await expect(banner).not.toBeVisible();
+
+    // Submit valid form
+    await page.fill('input[name="requestedTourDate"]', validFormData.date);
+    await page.fill('input[name="totalGuestCount"]', validFormData.guests);
+    await page.fill('input[name="guestName"]', validFormData.name);
+    await page.fill('input[name="phoneNumber"]', validFormData.phone);
+
+    await page.getByRole("button", { name: "Gửi yêu cầu đặt trải nghiệm" }).click();
+    await expect(page.getByRole("status")).toContainText("Đã ghi nhận yêu cầu của bạn");
+
+    expect(capturedPayload).not.toHaveProperty("landingPageKey");
+    expect(capturedPayload).not.toHaveProperty("acquisitionSource");
+  });
+
+  test("floating Zalo contact button opens approved Zalo link in new tab", async ({
+    page,
+  }) => {
+    await page.goto(TOUR_DETAIL_PATH);
+
+    const zaloButton = page.getByRole("link", { name: /Chat qua Zalo/i });
+    await expect(zaloButton).toBeVisible();
+    await expect(zaloButton).toHaveAttribute("target", "_blank");
+    await expect(zaloButton).toHaveAttribute("rel", "noopener noreferrer");
+    await expect(zaloButton).toHaveAttribute("href", /^https:\/\/zalo\.me\//);
+  });
 });

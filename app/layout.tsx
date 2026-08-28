@@ -14,6 +14,7 @@ const geistMono = Geist_Mono({
 
 import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
 import { FloatingZaloButton } from "@/components/floating-zalo-button";
+import { PostHogProvider } from "@/src/analytics/posthog-provider";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,9 +28,11 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
-        <FloatingZaloButton />
-        <AnalyticsConsentBanner />
+        <PostHogProvider>
+          {children}
+          <FloatingZaloButton />
+          <AnalyticsConsentBanner />
+        </PostHogProvider>
       </body>
     </html>
   );
