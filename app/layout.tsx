@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
 import { FloatingZaloButton } from "@/components/floating-zalo-button";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col">
         {children}
         <FloatingZaloButton />
+        <AnalyticsConsentBanner />
       </body>
     </html>
   );

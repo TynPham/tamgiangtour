@@ -321,4 +321,48 @@ describe("booking enquiry submission boundary", () => {
       outcome: "storage_failed",
     });
   });
+
+  it("persists optional normalized attribution when provided", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const handler = createBookingEnquiryHandler({
+      store,
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(
+      validRequest({
+        landingPageKey: "tour_detail",
+        acquisitionSource: "google_search",
+      }),
+    );
+
+    expect(response.status).toBe(201);
+    expect(store.records).toHaveLength(1);
+    expect(store.records[0]).toMatchObject({
+      landingPageKey: "tour_detail",
+      acquisitionSource: "google_search",
+    });
+  });
+
+  it("rejects unrecognized raw attribution/UTM keys with invalid_request", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const handler = createBookingEnquiryHandler({
+      store,
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(
+      validRequest({
+        utm_campaign: "summer_sale",
+      }),
+    );
+
+    expect(response.status).toBe(400);
+    await expect(response.json()).resolves.toEqual({
+      outcome: "invalid_request",
+    });
+    expect(store.records).toHaveLength(0);
+  });
 });

@@ -37,6 +37,15 @@ export type ValidatedBookingEnquiryFields = {
 export type BookingEnquiryPayload = ValidatedBookingEnquiryFields & {
   locale: "vi";
   sourcePage: "tour_detail";
+  landingPageKey?: "home" | "tour_detail" | "contact";
+  acquisitionSource?:
+    | "direct"
+    | "google_search"
+    | "google_maps"
+    | "facebook"
+    | "tiktok"
+    | "other_referrer"
+    | "unknown";
 };
 
 export type BookingEnquirySubmissionResult =
@@ -201,10 +210,27 @@ export function normalizeBookingEnquiryFormValues(
 
 export function createBookingEnquiryPayload(
   fields: ValidatedBookingEnquiryFields,
+  attribution?: {
+    landingPageKey?: "home" | "tour_detail" | "contact";
+    acquisitionSource?:
+      | "direct"
+      | "google_search"
+      | "google_maps"
+      | "facebook"
+      | "tiktok"
+      | "other_referrer"
+      | "unknown";
+  },
 ): BookingEnquiryPayload {
   return {
     ...fields,
     locale: "vi",
     sourcePage: "tour_detail",
+    ...(attribution?.landingPageKey
+      ? { landingPageKey: attribution.landingPageKey }
+      : {}),
+    ...(attribution?.acquisitionSource
+      ? { acquisitionSource: attribution.acquisitionSource }
+      : {}),
   };
 }

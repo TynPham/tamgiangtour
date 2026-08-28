@@ -37,6 +37,8 @@ describe("Supabase booking enquiry persistence", () => {
       p_requested_tour_date: "2026-08-29",
       p_source_page: "tour_detail",
       p_total_guest_count: 2,
+      p_landing_page_key: null,
+      p_acquisition_source: null,
     });
   });
 

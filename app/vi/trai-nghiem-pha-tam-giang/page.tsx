@@ -9,6 +9,11 @@ import {
   VIETNAMESE_OPERATOR_PHONE,
   VIETNAMESE_TOUR_CONTEXT,
 } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
+import {
+  TourDetailPageViewTracker,
+  TourDetailPrimaryCta,
+  handleTourDetailEnquiryAnalytics,
+} from "./tour-detail-client";
 
 export const metadata: Metadata = {
   title: "Trải nghiệm Phá Tam Giang",
@@ -22,6 +27,7 @@ export const metadata: Metadata = {
 export default function VietnameseTourDetailPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
+      <TourDetailPageViewTracker />
       <header className="border-b border-border/80 bg-muted/20 px-4 py-12 sm:px-6 sm:py-16">
         <div className="mx-auto max-w-3xl space-y-5">
           <div className="flex items-center gap-2">
@@ -37,12 +43,7 @@ export default function VietnameseTourDetailPage() {
             Khám phá vẻ đẹp vùng đầm phá Tam Giang cùng ngư dân địa phương. Đón hoàng hôn trên phá, chèo SUP và trải nghiệm đời sống sông nước mộc mạc.
           </p>
           <div className="pt-2">
-            <Button asChild size="lg" className="min-h-12 w-full px-7 text-base font-semibold shadow-sm sm:w-auto">
-              <a href="#booking-enquiry">
-                Gửi yêu cầu đặt trải nghiệm
-                <ArrowDown aria-hidden="true" className="ml-2 size-4" />
-              </a>
-            </Button>
+            <TourDetailPrimaryCta />
           </div>
         </div>
       </header>
@@ -52,6 +53,7 @@ export default function VietnameseTourDetailPage() {
           tour={VIETNAMESE_TOUR_CONTEXT}
           copy={VIETNAMESE_BOOKING_ENQUIRY_COPY}
           phone={VIETNAMESE_OPERATOR_PHONE}
+          onAnalyticsEvent={handleTourDetailEnquiryAnalytics}
         />
       </main>
     </div>

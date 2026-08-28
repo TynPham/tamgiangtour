@@ -37,6 +37,9 @@ import {
 } from "./booking-enquiry-contract";
 import { submitBookingEnquiry as submitBookingEnquiryRequest } from "./booking-enquiry-client";
 import { useBookingEnquirySubmission } from "./use-booking-enquiry-submission";
+import { analytics } from "@/src/analytics/analytics-client";
+import { hasAnalyticsConsent } from "@/src/analytics/consent";
+import { getVisitAttribution } from "@/src/analytics/attribution";
 
 export type {
   BookingEnquiryAnalyticsEvent,
@@ -280,9 +283,41 @@ export function BookingEnquirySection({
   async function submitValidValues(values: BookingEnquiryFormValues) {
     setShowErrorSummary(false);
 
+    let attribution: {
+      landingPageKey?: "home" | "tour_detail" | "contact";
+      acquisitionSource?:
+        | "direct"
+        | "google_search"
+        | "google_maps"
+        | "facebook"
+        | "tiktok"
+        | "other_referrer"
+        | "unknown";
+    } | undefined;
+
+    try {
+      if (hasAnalyticsConsent()) {
+        const parsed = getVisitAttribution({
+          hasConsent: true,
+          landingPageKey: "tour_detail",
+          referrer: typeof document !== "undefined" ? document.referrer : undefined,
+          searchParams: typeof window !== "undefined" ? new URLSearchParams(window.location.search) : undefined,
+        });
+        if (parsed) {
+          attribution = {
+            landingPageKey: parsed.landing_page_key,
+            acquisitionSource: parsed.acquisition_source,
+          };
+        }
+      }
+    } catch {
+      // Attribution calculation failure must never block booking enquiry submission
+    }
+
     await submitPayload(
       createBookingEnquiryPayload(
         normalizeBookingEnquiryFormValues(values),
+        attribution,
       ),
     );
   }
@@ -605,7 +640,10 @@ export function BookingEnquirySection({
                     variant="link"
                     className="mt-2.5 h-auto justify-start p-0 text-sm font-medium text-primary hover:underline"
                   >
-                    <a href={phone.href}>
+                    <a
+                      href={phone.href}
+                      onClick={() => analytics.trackContact("phone", "tour_detail", "vi")}
+                    >
                       <Phone aria-hidden="true" className="size-3.5 mr-1 text-muted-foreground inline" />
                       {copy.phoneFallback}: {phone.display}
                     </a>

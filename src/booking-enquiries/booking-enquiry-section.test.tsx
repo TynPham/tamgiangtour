@@ -341,4 +341,33 @@ describe("Booking enquiry section", () => {
     expect(onAnalyticsEvent).toHaveBeenCalledTimes(1);
     expect(onAnalyticsEvent).toHaveBeenCalledWith({ name: "booking_enquiry_started" });
   });
+
+  it("does not double-count booking_enquiry_submitted on idempotent replay", async () => {
+    const onAnalyticsEvent = vi.fn();
+    const submitEnquiry = vi.fn().mockResolvedValue({ outcome: "recorded", replayed: true });
+    renderSection({ onAnalyticsEvent, submitEnquiry });
+    await fillValidForm();
+    await userEvent.click(screen.getByRole("button", { name: copy.submit }));
+    await screen.findByText(copy.receipt.heading);
+
+    expect(onAnalyticsEvent).toHaveBeenCalledWith({ name: "booking_enquiry_started" });
+    expect(onAnalyticsEvent).not.toHaveBeenCalledWith({ name: "booking_enquiry_submitted" });
+  });
+
+  it("emits booking_enquiry_validation_failed with field keys on authoritative server rejection", async () => {
+    const onAnalyticsEvent = vi.fn();
+    const submitEnquiry = vi.fn().mockResolvedValue({
+      outcome: "validation_failed",
+      invalidFields: ["phoneNumber"],
+    });
+    renderSection({ onAnalyticsEvent, submitEnquiry });
+    await fillValidForm();
+    await userEvent.click(screen.getByRole("button", { name: copy.submit }));
+    await screen.findByText(copy.errorSummaryHeading);
+
+    expect(onAnalyticsEvent).toHaveBeenCalledWith({
+      name: "booking_enquiry_validation_failed",
+      fieldKeys: ["phoneNumber"],
+    });
+  });
 });

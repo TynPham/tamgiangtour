@@ -46,7 +46,9 @@ export function useBookingEnquirySubmission({
         if (result.outcome === "recorded") {
           attemptRef.current = null;
           setReceipt(attempt.payload);
-          emit({ name: "booking_enquiry_submitted" });
+          if (!result.replayed) {
+            emit({ name: "booking_enquiry_submitted" });
+          }
           return;
         }
         if (result.outcome === "validation_failed") {
