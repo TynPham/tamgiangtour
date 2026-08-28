@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { AlertCircle, CheckCircle2, LoaderCircle } from "lucide-react";
+import { AlertCircle, CheckCircle2, Compass, LoaderCircle, Phone } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useForm, type SubmitErrorHandler } from "react-hook-form";
 
@@ -110,11 +110,17 @@ function BookingFieldHeading({
   requirementCopy: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4">
-      <FormLabel htmlFor={id} className="text-base leading-normal font-semibold">
+    <div className="flex items-baseline justify-between gap-4 mb-2">
+      <FormLabel
+        htmlFor={id}
+        className="text-sm font-semibold leading-none text-foreground data-[error=true]:text-foreground tracking-tight cursor-pointer"
+      >
         {copy.label}
       </FormLabel>
-      <span aria-hidden="true" className="text-sm text-foreground/65">
+      <span
+        aria-hidden="true"
+        className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground tracking-normal"
+      >
         {requirementCopy}
       </span>
     </div>
@@ -130,7 +136,7 @@ function BookingFieldDescription({
 }) {
   return (
     <FormDescription
-      className={copy.hint ? "leading-6 text-foreground/70" : "sr-only"}
+      className={copy.hint ? "text-xs leading-relaxed text-muted-foreground mt-1.5" : "sr-only"}
     >
       <span className="sr-only">{requirementCopy}. </span>
       {copy.hint}
@@ -319,7 +325,7 @@ export function BookingEnquirySection({
     <section
       id={BOOKING_ENQUIRY_ANCHOR}
       aria-labelledby={`${BOOKING_ENQUIRY_ANCHOR}-heading`}
-      className="scroll-mt-6 bg-background px-4 py-12 sm:px-6 sm:py-16"
+      className="scroll-mt-8 bg-background px-4 py-10 sm:px-6 sm:py-16"
     >
       <div className="mx-auto max-w-2xl">
         <div className="space-y-3">
@@ -327,43 +333,73 @@ export function BookingEnquirySection({
             ref={headingRef}
             id={`${BOOKING_ENQUIRY_ANCHOR}-heading`}
             tabIndex={-1}
-            className="text-2xl font-bold tracking-tight outline-none focus-visible:rounded-md focus-visible:ring-2 focus-visible:ring-foreground focus-visible:ring-offset-4 sm:text-3xl"
+            className="text-2xl font-bold tracking-tight text-foreground outline-none focus-visible:rounded-lg focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 sm:text-3xl text-balance"
           >
             {copy.heading}
           </h2>
-          <p className="max-w-prose text-base leading-7 text-foreground/75">
+          <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
             {copy.introduction}
           </p>
         </div>
 
-        <div className="mt-6 rounded-2xl border border-foreground/15 bg-foreground/[0.035] p-4 sm:p-5">
-          <p className="font-semibold">{tour.title}</p>
-          <p className="mt-1 text-sm leading-6 text-foreground/70">{tour.summary}</p>
+        <div className="mt-6 rounded-xl border border-border/80 bg-card/60 p-4 sm:p-5 shadow-xs transition-colors">
+          <div className="flex items-start gap-3.5">
+            <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Compass aria-hidden="true" className="size-5" />
+            </div>
+            <div className="space-y-1">
+              <p className="text-base font-semibold tracking-tight text-foreground">{tour.title}</p>
+              <p className="text-sm leading-relaxed text-muted-foreground">{tour.summary}</p>
+            </div>
+          </div>
         </div>
 
         {receipt ? (
           <div
             role="status"
             aria-live="polite"
-            className="mt-8 rounded-2xl border border-foreground/20 p-5 sm:p-6"
+            className="mt-4 sm:mt-5 rounded-2xl border border-emerald-500/20 bg-card p-6 shadow-sm sm:p-8 space-y-6"
           >
-            <CheckCircle2 aria-hidden="true" className="size-6" />
-            <h3 className="mt-4 text-xl font-bold">{copy.receipt.heading}</h3>
-            <p className="mt-2 leading-7">{copy.receipt.message}</p>
-            <p className="mt-2 font-semibold">{copy.receipt.notConfirmed}</p>
-            <dl className="mt-5 grid gap-3 rounded-xl bg-foreground/[0.035] p-4 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm text-foreground/65">{copy.receipt.requestedDateLabel}</dt>
-                <dd className="font-semibold">
+            <div className="flex items-center gap-3">
+              <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-4 ring-emerald-500/5">
+                <CheckCircle2 aria-hidden="true" className="size-5" />
+              </div>
+              <h3 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
+                {copy.receipt.heading}
+              </h3>
+            </div>
+            
+            <div className="space-y-3">
+              <p className="text-base leading-relaxed text-muted-foreground">
+                {copy.receipt.message}
+              </p>
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3">
+                <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+                  {copy.receipt.notConfirmed}
+                </p>
+              </div>
+            </div>
+
+            <dl className="grid gap-3.5 rounded-xl border border-border/80 bg-muted/40 p-4.5 sm:grid-cols-2">
+              <div className="space-y-1">
+                <dt className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
+                  {copy.receipt.requestedDateLabel}
+                </dt>
+                <dd className="text-base font-semibold text-foreground">
                   {formatBookingEnquiryDate(receipt.requestedTourDate)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-sm text-foreground/65">{copy.receipt.guestCountLabel}</dt>
-                <dd className="font-semibold">{receipt.totalGuestCount}</dd>
+              <div className="space-y-1">
+                <dt className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
+                  {copy.receipt.guestCountLabel}
+                </dt>
+                <dd className="text-base font-semibold text-foreground">
+                  {receipt.totalGuestCount}
+                </dd>
               </div>
             </dl>
-            <p className="mt-3 text-sm leading-6 text-foreground/70">
+            
+            <p className="text-xs leading-relaxed text-muted-foreground italic">
               {copy.receipt.preferenceNote}
             </p>
           </div>
@@ -372,7 +408,7 @@ export function BookingEnquirySection({
             <form
               aria-label={copy.heading}
               aria-busy={pending}
-              className="mt-8 space-y-6"
+              className="mt-4 sm:mt-5 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8 space-y-6"
               noValidate
               onSubmit={handleSubmit}
             >
@@ -381,17 +417,22 @@ export function BookingEnquirySection({
                 ref={errorSummaryRef}
                 variant="destructive"
                 tabIndex={-1}
-                className="p-4 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+                className="border-destructive/30 bg-destructive/5 text-destructive p-4 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
               >
-                <AlertCircle aria-hidden="true" />
-                <AlertTitle className="font-bold">
+                <AlertCircle aria-hidden="true" className="size-4 text-destructive" />
+                <AlertTitle className="font-semibold tracking-tight">
                   {copy.errorSummaryHeading}
                 </AlertTitle>
-                <AlertDescription>
-                  <ul className="mt-2 list-disc space-y-1 pl-5">
+                <AlertDescription className="mt-2">
+                  <ul className="list-disc space-y-1.5 pl-5 text-sm">
                     {summaryFields.map((name) => (
                       <li key={name}>
-                        <a href={`#${name}`}>{fieldError(name)}</a>
+                        <a
+                          href={`#${name}`}
+                          className="font-medium underline underline-offset-3 hover:text-destructive/80 transition-colors"
+                        >
+                          {fieldError(name)}
+                        </a>
                       </li>
                     ))}
                   </ul>
@@ -417,12 +458,12 @@ export function BookingEnquirySection({
               control={form.control}
               name="requestedTourDate"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-0">
                   <BookingFieldHeading copy={copy.fields.requestedTourDate} id="requestedTourDate" requirementCopy={copy.requiredHint} />
                   <FormControl id="requestedTourDate">
                     <Input
                       {...field}
-                      className="min-h-12 px-3 py-2 text-base md:text-base"
+                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="date"
                       required
                       disabled={fieldLocked}
@@ -433,7 +474,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.requestedTourDate} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="font-medium leading-6" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
                 </FormItem>
               )}
             />
@@ -442,12 +483,12 @@ export function BookingEnquirySection({
               control={form.control}
               name="totalGuestCount"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-0">
                   <BookingFieldHeading copy={copy.fields.totalGuestCount} id="totalGuestCount" requirementCopy={copy.requiredHint} />
                   <FormControl id="totalGuestCount">
                     <Input
                       {...field}
-                      className="min-h-12 px-3 py-2 text-base md:text-base"
+                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="number"
                       inputMode="numeric"
                       min={1}
@@ -461,7 +502,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.totalGuestCount} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="font-medium leading-6" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
                 </FormItem>
               )}
             />
@@ -470,12 +511,12 @@ export function BookingEnquirySection({
               control={form.control}
               name="guestName"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-0">
                   <BookingFieldHeading copy={copy.fields.guestName} id="guestName" requirementCopy={copy.requiredHint} />
                   <FormControl id="guestName">
                     <Input
                       {...field}
-                      className="min-h-12 px-3 py-2 text-base md:text-base"
+                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="text"
                       autoComplete="name"
                       maxLength={100}
@@ -488,7 +529,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.guestName} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="font-medium leading-6" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
                 </FormItem>
               )}
             />
@@ -497,12 +538,12 @@ export function BookingEnquirySection({
               control={form.control}
               name="phoneNumber"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-0">
                   <BookingFieldHeading copy={copy.fields.phoneNumber} id="phoneNumber" requirementCopy={copy.requiredHint} />
                   <FormControl id="phoneNumber">
                     <Input
                       {...field}
-                      className="min-h-12 px-3 py-2 text-base md:text-base"
+                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="tel"
                       inputMode="tel"
                       autoComplete="tel"
@@ -515,7 +556,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.phoneNumber} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="font-medium leading-6" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
                 </FormItem>
               )}
             />
@@ -524,12 +565,12 @@ export function BookingEnquirySection({
               control={form.control}
               name="guestNotes"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="space-y-0">
                   <BookingFieldHeading copy={copy.fields.guestNotes} id="guestNotes" requirementCopy={copy.optionalHint} />
                   <FormControl id="guestNotes">
                     <Textarea
                       {...field}
-                      className="min-h-28 px-3 py-3 text-base md:text-base"
+                      className="min-h-28 px-3.5 py-2.5 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       maxLength={1_000}
                       disabled={fieldLocked}
                       onChange={(event) => {
@@ -539,32 +580,33 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.guestNotes} requirementCopy={copy.optionalHint} />
-                  <FormMessage className="font-medium leading-6" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
                 </FormItem>
               )}
             />
 
             {pending ? (
-              <p role="status" aria-live="polite" className="flex items-center gap-2 text-sm font-medium">
-                <LoaderCircle aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />
+              <div role="status" aria-live="polite" className="flex items-center gap-2.5 text-sm font-medium text-muted-foreground py-1">
+                <LoaderCircle aria-hidden="true" className="size-4 animate-spin text-primary motion-reduce:animate-none" />
                 {copy.submitting}
-              </p>
+              </div>
             ) : null}
 
             {failureCopy ? (
-              <Alert className="p-4">
-                <AlertCircle aria-hidden="true" />
-                <AlertTitle className="font-bold">
+              <Alert className="border-border bg-muted/40 p-4.5">
+                <AlertCircle aria-hidden="true" className="size-4 text-foreground" />
+                <AlertTitle className="font-semibold tracking-tight text-foreground">
                   {failureCopy.heading}
                 </AlertTitle>
-                <AlertDescription>
-                  <p className="leading-6">{failureCopy.message}</p>
+                <AlertDescription className="mt-2">
+                  <p className="text-sm leading-relaxed text-muted-foreground">{failureCopy.message}</p>
                   <Button
                     asChild
                     variant="link"
-                    className="mt-3 min-h-12 justify-start px-0 text-base"
+                    className="mt-2.5 h-auto justify-start p-0 text-sm font-medium text-primary hover:underline"
                   >
                     <a href={phone.href}>
+                      <Phone aria-hidden="true" className="size-3.5 mr-1 text-muted-foreground inline" />
                       {copy.phoneFallback}: {phone.display}
                     </a>
                   </Button>
@@ -572,9 +614,16 @@ export function BookingEnquirySection({
               </Alert>
             ) : null}
 
-            <Button type="submit" disabled={pending || failure === "conflict"} className="min-h-12 w-full px-5 text-base sm:w-auto">
-              {failureCopy?.retry ?? copy.submit}
-            </Button>
+            <div className="pt-2">
+              <Button
+                type="submit"
+                size="lg"
+                disabled={pending || failure === "conflict"}
+                className="min-h-12 w-full px-8 text-base font-semibold shadow-sm transition-all duration-150 active:scale-[0.99] sm:w-auto"
+              >
+                {failureCopy?.retry ?? copy.submit}
+              </Button>
+            </div>
             </form>
           </Form>
         )}
