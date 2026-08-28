@@ -80,3 +80,13 @@ export const VIETNAMESE_OPERATOR_PHONE = {
   display: "0332 279 474",
   href: "tel:+84332279474",
 };
+
+export const VIETNAMESE_ZALO_CONTACT = {
+  phone: VIETNAMESE_OPERATOR_PHONE.display,
+  href:
+    process.env.NEXT_PUBLIC_ZALO_URL ||
+    `https://zalo.me/${VIETNAMESE_OPERATOR_PHONE.display.replace(/\s+/g, "")}`,
+  label: "Chat qua Zalo",
+  ariaLabel: `Chat qua Zalo: ${VIETNAMESE_OPERATOR_PHONE.display}`,
+};
+
