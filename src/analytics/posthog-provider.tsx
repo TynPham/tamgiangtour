@@ -8,7 +8,7 @@ export function PostHogProvider({ children }: { children: React.ReactNode }) {
     const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
     const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
 
-    if (typeof window !== "undefined" && posthogKey) {
+    if (typeof window !== "undefined" && posthogKey && !posthog.__loaded) {
       posthog.init(posthogKey, {
         api_host: posthogHost,
         autocapture: false,
