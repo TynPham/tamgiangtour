@@ -2,7 +2,14 @@ import { createHash } from "node:crypto";
 
 import { z } from "zod";
 
-const TOUR_TIME_ZONE = "Asia/Ho_Chi_Minh";
+import {
+  BOOKING_ENQUIRY_FIELD_NAMES,
+  createBookingEnquiryFormSchema,
+  normalizeBookingEnquiryFormValues,
+  tourLocalDate,
+  type BookingEnquiryValidationMessages,
+} from "./booking-enquiry-contract";
+
 const MAX_PAYLOAD_BYTES = 16 * 1_024;
 
 const submissionSchema = z
@@ -51,42 +58,9 @@ type HandlerDependencies = {
   now?: () => Date;
 };
 
-function localDate(date: Date) {
-  const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: TOUR_TIME_ZONE,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).formatToParts(date);
-  const part = (type: Intl.DateTimeFormatPartTypes) =>
-    parts.find((candidate) => candidate.type === type)?.value ?? "";
-
-  return `${part("year")}-${part("month")}-${part("day")}`;
-}
-
-function isCalendarDate(value: string) {
-  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
-  if (!match) return false;
-
-  const year = Number(match[1]);
-  const month = Number(match[2]);
-  const day = Number(match[3]);
-  const candidate = new Date(Date.UTC(year, month - 1, day));
-
-  return (
-    candidate.getUTCFullYear() === year &&
-    candidate.getUTCMonth() === month - 1 &&
-    candidate.getUTCDate() === day
-  );
-}
-
-function normalizePhone(value: string) {
-  const trimmed = value.trim();
-  if (!/^\+?[\d\s().-]+$/.test(trimmed)) return null;
-
-  const normalized = trimmed.replace(/[\s().-]/g, "");
-  return /^\+?\d{8,15}$/.test(normalized) ? normalized : null;
-}
+const SERVER_VALIDATION_MESSAGES = Object.fromEntries(
+  BOOKING_ENQUIRY_FIELD_NAMES.map((name) => [name, name]),
+) as BookingEnquiryValidationMessages;
 
 function fingerprint(input: Omit<PersistBookingEnquiryInput, "payloadFingerprint">) {
   return createHash("sha256").update(JSON.stringify(input)).digest("hex");
@@ -150,51 +124,39 @@ export function createBookingEnquiryHandler({
       ];
       return json({ outcome: "validation_failed", invalidFields }, 422);
     }
-    if ((parsed.data.website ?? "").trim().length > 0) {
-      return json({ outcome: "rejected" }, 400);
-    }
-
-    const guestName = parsed.data.guestName.trim();
-    const phoneNumber = normalizePhone(parsed.data.phoneNumber);
-    const guestNotes = parsed.data.guestNotes?.trim() || null;
-    const requestedTourDate = parsed.data.requestedTourDate;
-
-    const invalidFields: string[] = [];
-    if (
-      guestName.length === 0 ||
-      guestName.length > 100 ||
-      !/\p{L}/u.test(guestName)
-    ) {
-      invalidFields.push("guestName");
-    }
-    if (!phoneNumber) invalidFields.push("phoneNumber");
-    if (
-      !isCalendarDate(requestedTourDate) ||
-      requestedTourDate < localDate(now())
-    ) {
-      invalidFields.push("requestedTourDate");
-    }
-    if (
-      !Number.isInteger(parsed.data.totalGuestCount) ||
-      parsed.data.totalGuestCount < 1
-    ) {
-      invalidFields.push("totalGuestCount");
-    }
-    if ((guestNotes?.length ?? 0) > 1_000) {
-      invalidFields.push("guestNotes");
-    }
-    if (invalidFields.length > 0) {
+    const validated = createBookingEnquiryFormSchema({
+      messages: SERVER_VALIDATION_MESSAGES,
+      today: () => tourLocalDate(now()),
+    }).safeParse({
+      requestedTourDate: parsed.data.requestedTourDate,
+      totalGuestCount: String(parsed.data.totalGuestCount),
+      guestName: parsed.data.guestName,
+      phoneNumber: parsed.data.phoneNumber,
+      guestNotes: parsed.data.guestNotes ?? "",
+      website: parsed.data.website ?? "",
+    });
+    if (!validated.success) {
+      const invalidFields = [
+        ...new Set(
+          validated.error.issues
+            .map((issue) => issue.path[0])
+            .filter((field): field is string => typeof field === "string"),
+        ),
+      ];
       return json({ outcome: "validation_failed", invalidFields }, 422);
     }
-    const normalizedPhoneNumber = phoneNumber as string;
+    if (validated.data.website.trim()) {
+      return json({ outcome: "rejected" }, 400);
+    }
+    const fields = normalizeBookingEnquiryFormValues(validated.data);
 
     const normalized = {
       idempotencyKey,
-      requestedTourDate,
-      totalGuestCount: parsed.data.totalGuestCount,
-      guestName,
-      phoneNumber: normalizedPhoneNumber,
-      guestNotes,
+      requestedTourDate: fields.requestedTourDate,
+      totalGuestCount: fields.totalGuestCount,
+      guestName: fields.guestName,
+      phoneNumber: fields.phoneNumber,
+      guestNotes: fields.guestNotes ?? null,
       locale: parsed.data.locale,
       sourcePage: parsed.data.sourcePage,
     } satisfies Omit<PersistBookingEnquiryInput, "payloadFingerprint">;
