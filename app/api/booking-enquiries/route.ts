@@ -2,7 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 
 import { createInMemoryRateLimiter } from "@/src/booking-enquiries/in-memory-rate-limiter";
 import { createBookingEnquiryHandler } from "@/src/booking-enquiries/submit-booking-enquiry";
+import { createOperatorNotificationHandoff } from "@/src/booking-enquiries/operator-notification";
 import { createSupabaseBookingEnquiryStore } from "@/src/booking-enquiries/supabase-booking-enquiry-store";
+import { createSupabaseOperatorNotificationStore } from "@/src/booking-enquiries/supabase-operator-notification-store";
+import { createTelegramNotificationChannel } from "@/src/booking-enquiries/telegram-notification-channel";
 
 export const runtime = "nodejs";
 
@@ -31,6 +34,13 @@ function productionHandler() {
 
   return createBookingEnquiryHandler({
     store: createSupabaseBookingEnquiryStore(client),
+    notifications: createOperatorNotificationHandoff({
+      channel: createTelegramNotificationChannel({
+        botToken: process.env.TELEGRAM_BOT_TOKEN ?? "",
+        chatId: process.env.TELEGRAM_CHAT_ID ?? "",
+      }),
+      store: createSupabaseOperatorNotificationStore(client),
+    }),
     rateLimiter,
   });
 }

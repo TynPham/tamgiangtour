@@ -7,6 +7,7 @@ import {
   type PersistBookingEnquiryResult,
 } from "./submit-booking-enquiry";
 import { createInMemoryRateLimiter } from "./in-memory-rate-limiter";
+import type { OperatorNotificationHandoff } from "./operator-notification";
 
 class MemoryBookingEnquiryStore implements BookingEnquiryStore {
   readonly records: PersistBookingEnquiryInput[] = [];
@@ -50,6 +51,28 @@ function validRequest(overrides: Record<string, unknown> = {}) {
 }
 
 describe("booking enquiry submission boundary", () => {
+  it("hands a newly stored enquiry to operator notification once", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const deliveredEnquiryIds: string[] = [];
+    const notifications: OperatorNotificationHandoff = {
+      deliverStoredEnquiry: async (enquiryId) => {
+        deliveredEnquiryIds.push(enquiryId);
+        return { outcome: "delivered" };
+      },
+    };
+    const handler = createBookingEnquiryHandler({
+      store,
+      notifications,
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(validRequest());
+
+    expect(response.status).toBe(201);
+    expect(deliveredEnquiryIds).toEqual(["enquiry-1"]);
+  });
+
   it("durably records one normalized booking enquiry", async () => {
     const store = new MemoryBookingEnquiryStore();
     const handler = createBookingEnquiryHandler({
@@ -173,8 +196,15 @@ describe("booking enquiry submission boundary", () => {
 
   it("replays the original outcome for the same key and normalized payload", async () => {
     const store = new MemoryBookingEnquiryStore();
+    const deliveredEnquiryIds: string[] = [];
     const handler = createBookingEnquiryHandler({
       store,
+      notifications: {
+        deliverStoredEnquiry: async (enquiryId) => {
+          deliveredEnquiryIds.push(enquiryId);
+          return { outcome: "delivered" };
+        },
+      },
       rateLimiter: { allow: () => true },
       now: () => new Date("2026-08-28T05:00:00.000Z"),
     });
@@ -193,6 +223,30 @@ describe("booking enquiry submission boundary", () => {
     await expect(retry.json()).resolves.toEqual({
       outcome: "recorded",
       replayed: true,
+    });
+    expect(store.records).toHaveLength(1);
+    expect(deliveredEnquiryIds).toEqual(["enquiry-1"]);
+  });
+
+  it("keeps guest success after notification failure", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const handler = createBookingEnquiryHandler({
+      store,
+      notifications: {
+        deliverStoredEnquiry: async () => {
+          throw new Error("private notification failure");
+        },
+      },
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(validRequest());
+
+    expect(response.status).toBe(201);
+    await expect(response.json()).resolves.toEqual({
+      outcome: "recorded",
+      replayed: false,
     });
     expect(store.records).toHaveLength(1);
   });

@@ -9,6 +9,7 @@ import {
   tourLocalDate,
   type BookingEnquiryValidationMessages,
 } from "./booking-enquiry-contract";
+import type { OperatorNotificationHandoff } from "./operator-notification";
 
 const MAX_PAYLOAD_BYTES = 16 * 1_024;
 
@@ -54,6 +55,7 @@ export interface BookingEnquiryRateLimiter {
 
 type HandlerDependencies = {
   store: BookingEnquiryStore;
+  notifications?: OperatorNotificationHandoff;
   rateLimiter: BookingEnquiryRateLimiter;
   now?: () => Date;
 };
@@ -72,6 +74,7 @@ function json(body: unknown, status: number) {
 
 export function createBookingEnquiryHandler({
   store,
+  notifications,
   rateLimiter,
   now = () => new Date(),
 }: HandlerDependencies) {
@@ -169,6 +172,14 @@ export function createBookingEnquiryHandler({
 
       if (result.outcome === "conflict") {
         return json({ outcome: "conflict" }, 409);
+      }
+
+      if (result.outcome === "stored" && notifications) {
+        try {
+          await notifications.deliverStoredEnquiry(result.enquiryId);
+        } catch {
+          // Durable enquiry storage remains the guest success boundary.
+        }
       }
 
       return json(
