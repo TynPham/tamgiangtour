@@ -1,9 +1,12 @@
 import type { BookingEnquiryFieldName } from "@/src/booking-enquiries/booking-enquiry-contract";
 
-export type PageKey = "home" | "tour_detail" | "contact";
+export type PageKey = "home" | "tour_detail" | "contact" | "booking";
 export type Locale = "vi" | "en";
 export type ContactChannel = "phone" | "zalo";
 export type FailureCategory = "storage" | "network_or_unknown";
+export type DestinationKey =
+  | "booking_enquiry_page"
+  | "booking_enquiry_section";
 
 export type AcquisitionSource =
   | "direct"
@@ -26,7 +29,7 @@ export type PrimaryCtaClickedEvent = {
   name: "primary_cta_clicked";
   properties: {
     cta_key: "enquiry_start";
-    destination_key: "booking_enquiry_section";
+    destination_key: DestinationKey;
     page_key: PageKey;
     locale: Locale;
   };

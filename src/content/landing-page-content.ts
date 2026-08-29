@@ -144,8 +144,14 @@ export interface LandingPageContent {
     phoneHref: string;
     zaloLabel: string;
     zaloHref: string;
+    mapsPlaceKey: string;
     mapsPlaceName: string;
     mapsAddress: string;
+    mapsCoordinates?: {
+      lat: number;
+      lng: number;
+    };
+    mapsEmbedUrl: string;
     mapsHref: string;
     directionsTip: string;
   };
@@ -182,13 +188,13 @@ export const LANDING_PAGE_CONTENT: LandingPageContent = {
     brandName: "Phá Tam Giang",
     brandSubtitle: "Tour Gia đình Chú Huyền",
     items: [
-      { label: "Trải nghiệm", href: "#trai-nghiem" },
-      { label: "Lịch trình", href: "#lich-trinh" },
-      { label: "Dịch vụ", href: "#dich-vu" },
-      { label: "Câu chuyện", href: "#cau-chuyen" },
-      { label: "Khoảnh khắc", href: "#khoanh-khac" },
-      { label: "Hỏi đáp", href: "#faq" },
-      { label: "Liên hệ & Bản đồ", href: "#lien-he" },
+      { label: "Trải nghiệm", href: "/vi#trai-nghiem" },
+      { label: "Lịch trình", href: "/vi#lich-trinh" },
+      { label: "Dịch vụ", href: "/vi#dich-vu" },
+      { label: "Câu chuyện", href: "/vi#cau-chuyen" },
+      { label: "Khoảnh khắc", href: "/vi#khoanh-khac" },
+      { label: "Hỏi đáp", href: "/vi#faq" },
+      { label: "Liên hệ & Bản đồ", href: "/vi/lien-he" },
     ],
     ctaLabel: "Gửi yêu cầu đặt tour",
   },
@@ -519,10 +525,17 @@ export const LANDING_PAGE_CONTENT: LandingPageContent = {
     phoneHref: "tel:+84332279474",
     zaloLabel: "Nhắn tin qua Zalo",
     zaloHref: "https://zalo.me/0332279474",
+    mapsPlaceKey: "chu_huyen_boat_pier",
     mapsPlaceName: "Tour Du Lịch Phá Tam Giang - Chú Huyền",
     mapsAddress: "Bến thuyền Phá Tam Giang, Thừa Thiên Huế",
+    mapsCoordinates: {
+      lat: 16.6278753,
+      lng: 107.5060075,
+    },
+    mapsEmbedUrl:
+      "https://maps.google.com/maps?q=16.6278753,107.5060075+(Tour+Du+L%E1%BB%8Bch+Ph%C3%A1+Tam+Giang+-+Ch%C3%BA+Huy%E1%BB%81n)&t=&z=15&ie=UTF8&iwloc=&output=embed&hl=vi",
     mapsHref:
-      "https://www.google.com/maps/place/Tour+Du+l%E1%BB%8Bch+Ph%C3%A1+Tam+Giang+-+Ch%C3%BA+Huy%E1%BB%81n/@16.6278753,107.5060075",
+      "https://www.google.com/maps/place/Tour+Du+l%E1%BB%8Bch+Ph%C3%A1+Tam+Giang+-+Ch%C3%BA+Huy%E1%BB%81n/@16.6279712,107.5035184,17z/data=!4m10!1m2!2m1!1zdG91ciBkdSBs4buLY2ggcGjDoSB0YW0gZ2lhbmcgLSBjaMO6IGh1eeG7gW4!3m6!1s0x31410f0d57c95e1d:0x559dd7c2099bd6dd!8m2!3d16.6278753!4d107.5060075!15sCix0b3VyIGR1IGzhu4tjaCBwaMOhIHRhbSBnaWFuZyAtIGNow7ogaHV54buBbpIBDXRvdXJfb3BlcmF0b3LgAQA!16s%2Fg%2F11zf720lcw?entry=ttu&g_ep=EgoyMDI2MDgyNi4wIKXMDSoASAFQAw%3D%3D",
     directionsTip:
       "Từ trung tâm TP. Huế, đi theo Quốc lộ 49B hướng về đầm phá Tam Giang. Khi đến gần khu vực bến thuyền Chú Huyền, bạn có thể gọi hotline để được đón tiếp chỉ đường tận tình.",
   },
@@ -535,13 +548,13 @@ export const LANDING_PAGE_CONTENT: LandingPageContent = {
     address: "Bến thuyền Phá Tam Giang, Thừa Thiên Huế",
     copyrightYear: 2026,
     quickLinks: [
-      { label: "Trải nghiệm", href: "#trai-nghiem" },
-      { label: "Lịch trình", href: "#lich-trinh" },
-      { label: "Dịch vụ", href: "#dich-vu" },
-      { label: "Câu chuyện", href: "#cau-chuyen" },
-      { label: "Câu hỏi thường gặp", href: "#faq" },
-      { label: "Điểm đón & Bản đồ", href: "#lien-he" },
-      { label: "Gửi yêu cầu đặt tour", href: "#booking-enquiry" },
+      { label: "Trải nghiệm", href: "/vi#trai-nghiem" },
+      { label: "Lịch trình", href: "/vi#lich-trinh" },
+      { label: "Dịch vụ", href: "/vi#dich-vu" },
+      { label: "Câu chuyện", href: "/vi#cau-chuyen" },
+      { label: "Câu hỏi thường gặp", href: "/vi#faq" },
+      { label: "Điểm đón & Bản đồ", href: "/vi/lien-he" },
+      { label: "Gửi yêu cầu đặt tour", href: "/vi/dat-trai-nghiem" },
     ],
   },
 };

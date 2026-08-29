@@ -9,9 +9,9 @@ describe("AnalyticsTracker", () => {
       checkConsent: () => false,
     });
 
-    tracker.trackPageView("tour_detail", "vi");
-    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_section", "tour_detail", "vi");
-    tracker.trackContact("phone", "tour_detail", "vi");
+    tracker.trackPageView("booking", "vi");
+    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_page", "home", "vi");
+    tracker.trackContact("phone", "booking", "vi");
 
     expect(sinkMock).not.toHaveBeenCalled();
   });
@@ -23,11 +23,11 @@ describe("AnalyticsTracker", () => {
       checkConsent: () => true,
     });
 
-    tracker.trackPageView("tour_detail", "vi");
+    tracker.trackPageView("booking", "vi");
 
     expect(sinkMock).toHaveBeenCalledTimes(1);
     expect(sinkMock).toHaveBeenCalledWith("page_viewed", {
-      page_key: "tour_detail",
+      page_key: "booking",
       locale: "vi",
     });
   });
@@ -39,12 +39,12 @@ describe("AnalyticsTracker", () => {
       checkConsent: () => true,
     });
 
-    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_section", "tour_detail", "vi");
+    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_page", "home", "vi");
 
     expect(sinkMock).toHaveBeenCalledWith("primary_cta_clicked", {
       cta_key: "enquiry_start",
-      destination_key: "booking_enquiry_section",
-      page_key: "tour_detail",
+      destination_key: "booking_enquiry_page",
+      page_key: "home",
       locale: "vi",
     });
   });
@@ -77,12 +77,12 @@ describe("AnalyticsTracker", () => {
     tracker.trackBookingEnquiryEvent(
       { name: "booking_enquiry_started" },
       "trai-nghiem-pha-tam-giang",
-      "tour_detail",
+      "booking",
       "vi",
     );
     expect(sinkMock).toHaveBeenLastCalledWith("booking_enquiry_started", {
       tour_key: "trai-nghiem-pha-tam-giang",
-      page_key: "tour_detail",
+      page_key: "booking",
       locale: "vi",
     });
 
@@ -93,13 +93,13 @@ describe("AnalyticsTracker", () => {
         fieldKeys: ["phoneNumber", "requestedTourDate"],
       },
       "trai-nghiem-pha-tam-giang",
-      "tour_detail",
+      "booking",
       "vi",
     );
     expect(sinkMock).toHaveBeenLastCalledWith("booking_enquiry_validation_failed", {
       field_keys: ["phoneNumber", "requestedTourDate"],
       tour_key: "trai-nghiem-pha-tam-giang",
-      page_key: "tour_detail",
+      page_key: "booking",
       locale: "vi",
     });
 
@@ -107,12 +107,12 @@ describe("AnalyticsTracker", () => {
     tracker.trackBookingEnquiryEvent(
       { name: "booking_enquiry_submitted" },
       "trai-nghiem-pha-tam-giang",
-      "tour_detail",
+      "booking",
       "vi",
     );
     expect(sinkMock).toHaveBeenLastCalledWith("booking_enquiry_submitted", {
       tour_key: "trai-nghiem-pha-tam-giang",
-      page_key: "tour_detail",
+      page_key: "booking",
       locale: "vi",
     });
 
@@ -123,13 +123,13 @@ describe("AnalyticsTracker", () => {
         failureCategory: "storage",
       },
       "trai-nghiem-pha-tam-giang",
-      "tour_detail",
+      "booking",
       "vi",
     );
     expect(sinkMock).toHaveBeenLastCalledWith("booking_enquiry_submission_failed", {
       failure_category: "storage",
       tour_key: "trai-nghiem-pha-tam-giang",
-      page_key: "tour_detail",
+      page_key: "booking",
       locale: "vi",
     });
   });
@@ -144,9 +144,9 @@ describe("AnalyticsTracker", () => {
     });
 
     expect(() => {
-      tracker.trackPageView("tour_detail", "vi");
-      tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_section", "tour_detail", "vi");
-      tracker.trackContact("phone", "tour_detail", "vi");
+      tracker.trackPageView("booking", "vi");
+      tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_page", "tour_detail", "vi");
+      tracker.trackContact("phone", "booking", "vi");
     }).not.toThrow();
   });
 
@@ -167,11 +167,11 @@ describe("AnalyticsTracker", () => {
     activeSink = dynamicSinkMock;
 
     // Subsequent tracking succeeds
-    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_section", "tour_detail", "vi");
+    tracker.trackPrimaryCta("enquiry_start", "booking_enquiry_page", "tour_detail", "vi");
     expect(dynamicSinkMock).toHaveBeenCalledTimes(1);
     expect(dynamicSinkMock).toHaveBeenCalledWith("primary_cta_clicked", {
       cta_key: "enquiry_start",
-      destination_key: "booking_enquiry_section",
+      destination_key: "booking_enquiry_page",
       page_key: "tour_detail",
       locale: "vi",
     });
@@ -184,8 +184,8 @@ describe("AnalyticsTracker", () => {
     });
 
     expect(() => {
-      tracker.trackPageView("tour_detail", "vi");
-      tracker.trackContact("zalo", "tour_detail", "vi");
+      tracker.trackPageView("booking", "vi");
+      tracker.trackContact("zalo", "booking", "vi");
     }).not.toThrow();
   });
 });

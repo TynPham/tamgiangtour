@@ -4,6 +4,7 @@ import type {
 import type {
   CanonicalAnalyticsEvent,
   ContactChannel,
+  DestinationKey,
   FailureCategory,
   Locale,
   PageKey,
@@ -31,7 +32,7 @@ export interface AnalyticsTracker {
   trackPageView(pageKey: PageKey, locale?: Locale): void;
   trackPrimaryCta(
     ctaKey: "enquiry_start",
-    destinationKey: "booking_enquiry_section",
+    destinationKey: DestinationKey,
     pageKey: PageKey,
     locale?: Locale,
   ): void;
@@ -101,7 +102,7 @@ export function createAnalyticsTracker({
     },
     trackPrimaryCta(
       ctaKey: "enquiry_start",
-      destinationKey: "booking_enquiry_section",
+      destinationKey: DestinationKey,
       pageKey: PageKey,
       locale: Locale = "vi",
     ) {

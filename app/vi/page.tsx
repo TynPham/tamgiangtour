@@ -11,7 +11,6 @@ import { LandingGallery } from "@/components/landing/landing-gallery";
 import { LandingTrust } from "@/components/landing/landing-trust";
 import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingContact } from "@/components/landing/landing-contact";
-import { LandingBookingSection } from "@/components/landing/landing-booking-section";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
 
@@ -88,9 +87,6 @@ export default function VietnameseLandingPage() {
 
         {/* 11. Contact / Maps Section */}
         <LandingContact />
-
-        {/* 12. Booking CTA / Enquiry Path */}
-        <LandingBookingSection />
       </main>
 
       {/* 13. Footer */}

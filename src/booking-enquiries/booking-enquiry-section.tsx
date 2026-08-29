@@ -106,26 +106,32 @@ function systemNow() {
 function BookingFieldHeading({
   copy,
   id,
-  requirementCopy,
+  isRequired = true,
 }: {
   copy: FieldCopy;
   id: BookingEnquiryFieldName;
-  requirementCopy: string;
+  isRequired?: boolean;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-4 mb-2">
-      <FormLabel
-        htmlFor={id}
-        className="text-sm font-semibold leading-none text-foreground data-[error=true]:text-foreground tracking-tight cursor-pointer"
-      >
-        {copy.label}
-      </FormLabel>
-      <span
-        aria-hidden="true"
-        className="rounded-md bg-muted px-2 py-0.5 text-[11px] font-medium text-muted-foreground tracking-normal"
-      >
-        {requirementCopy}
-      </span>
+    <div className="flex items-baseline justify-between gap-2 mb-1.5">
+      <div className="flex items-center gap-0.5">
+        <FormLabel
+          htmlFor={id}
+          className="text-sm font-semibold leading-none text-foreground data-[error=true]:text-foreground tracking-tight cursor-pointer"
+        >
+          {copy.label}
+        </FormLabel>
+        {isRequired ? (
+          <span className="text-primary font-bold select-none text-sm leading-none" aria-hidden="true">
+            *
+          </span>
+        ) : null}
+      </div>
+      {!isRequired && copy.hint ? (
+        <span className="text-[11px] text-muted-foreground font-normal">
+          {copy.hint}
+        </span>
+      ) : null}
     </div>
   );
 }
@@ -139,7 +145,7 @@ function BookingFieldDescription({
 }) {
   return (
     <FormDescription
-      className={copy.hint ? "text-xs leading-relaxed text-muted-foreground mt-1.5" : "sr-only"}
+      className={copy.hint ? "text-xs leading-relaxed text-muted-foreground mt-1" : "sr-only"}
     >
       <span className="sr-only">{requirementCopy}. </span>
       {copy.hint}
@@ -232,7 +238,6 @@ export function BookingEnquirySection({
     failure,
     pending,
     receipt,
-    retryAmbiguous,
     submitPayload,
   } = useBookingEnquirySubmission({
     createIdempotencyKey,
@@ -248,102 +253,97 @@ export function BookingEnquirySection({
       }
     };
     focusHeading();
-    const focusAfterAnchorActivation = (event: MouseEvent) => {
-      const target = event.target;
-      if (!(target instanceof Element)) return;
-      const link = target.closest<HTMLAnchorElement>("a[href]");
-      if (!link) return;
-      const destination = new URL(link.href);
-      const current = new URL(window.location.href);
-      const isSameDocument =
-        destination.origin === current.origin &&
-        destination.pathname === current.pathname &&
-        destination.search === current.search;
+
+    const handleHashClick = (event: MouseEvent) => {
+      const target = (event.target as HTMLElement | null)?.closest("a");
+      if (!target) return;
+      const href = target.getAttribute("href") || "";
+      const currentPath = window.location.pathname;
       if (
-        !isSameDocument ||
-        destination.hash !== `#${BOOKING_ENQUIRY_ANCHOR}`
+        href === `#${BOOKING_ENQUIRY_ANCHOR}` ||
+        href === `${currentPath}#${BOOKING_ENQUIRY_ANCHOR}`
       ) {
-        return;
+        requestAnimationFrame(() => {
+          headingRef.current?.focus();
+        });
       }
-      requestAnimationFrame(focusHeading);
     };
-    window.addEventListener("hashchange", focusHeading);
-    document.addEventListener("click", focusAfterAnchorActivation);
+
+    document.addEventListener("click", handleHashClick);
     return () => {
-      window.removeEventListener("hashchange", focusHeading);
-      document.removeEventListener("click", focusAfterAnchorActivation);
+      document.removeEventListener("click", handleHashClick);
     };
   }, []);
 
-  function fieldError(name: BookingEnquiryFieldName) {
-    const message = form.formState.errors[name]?.message;
-    return typeof message === "string" ? message : undefined;
-  }
-
-  async function submitValidValues(values: BookingEnquiryFormValues) {
-    setShowErrorSummary(false);
-
-    let attribution: {
-      landingPageKey?: "home" | "tour_detail" | "contact";
-      acquisitionSource?:
-        | "direct"
-        | "google_search"
-        | "google_maps"
-        | "facebook"
-        | "tiktok"
-        | "other_referrer"
-        | "unknown";
-    } | undefined;
-
-    try {
-      if (hasAnalyticsConsent()) {
-        const parsed = getVisitAttribution({
-          hasConsent: true,
-          landingPageKey: "tour_detail",
-          referrer: typeof document !== "undefined" ? document.referrer : undefined,
-          searchParams: typeof window !== "undefined" ? new URLSearchParams(window.location.search) : undefined,
-        });
-        if (parsed) {
-          attribution = {
-            landingPageKey: parsed.landing_page_key,
-            acquisitionSource: parsed.acquisition_source,
-          };
-        }
+  const clearFieldError = useCallback(
+    (name: BookingEnquiryFieldName) => {
+      if (!form.formState.errors[name]) {
+        return;
       }
-    } catch {
-      // Attribution calculation failure must never block booking enquiry submission
-    }
+      form.clearErrors(name);
+      if (
+        BOOKING_ENQUIRY_FIELD_NAMES.every((fieldName) =>
+          fieldName === name ? true : !form.formState.errors[fieldName],
+        )
+      ) {
+        setShowErrorSummary(false);
+      }
+    },
+    [form],
+  );
 
-    await submitPayload(
-      createBookingEnquiryPayload(
-        normalizeBookingEnquiryFormValues(values),
-        attribution,
-      ),
-    );
-  }
+  useEffect(() => {
+    const subscription = form.watch((_value, { name }) => {
+      if (!name) return;
+      clearFieldError(name as BookingEnquiryFieldName);
+    });
+    return () => subscription.unsubscribe();
+  }, [clearFieldError, form]);
 
-  const handleInvalidValues: SubmitErrorHandler<BookingEnquiryFormValues> = () => {
-    setShowErrorSummary(true);
-    focusErrorSummary();
-  };
+  const handleSubmit = form.handleSubmit(
+    async (values) => {
+      setShowErrorSummary(false);
 
-  function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    if (pending) {
-      event.preventDefault();
-      return;
-    }
-    announceStart();
+      const hasConsent = hasAnalyticsConsent();
+      const attribution = getVisitAttribution({
+        hasConsent,
+        landingPageKey: "booking",
+        referrer: typeof document !== "undefined" ? document.referrer : null,
+        searchParams:
+          typeof window !== "undefined"
+            ? new URLSearchParams(window.location.search)
+            : null,
+      });
 
-    if (failure === "ambiguous") {
-      event.preventDefault();
-      void retryAmbiguous();
-      return;
-    }
+      const normalized = normalizeBookingEnquiryFormValues(values);
+      const payload = createBookingEnquiryPayload(
+        normalized,
+        attribution
+          ? {
+              landingPageKey: attribution.landing_page_key as "home" | "tour_detail" | "contact",
+              acquisitionSource: attribution.acquisition_source,
+            }
+          : undefined,
+      );
 
-    void form.handleSubmit(submitValidValues, handleInvalidValues)(event);
-  }
+      await submitPayload(payload);
+    },
+    (errors: Parameters<SubmitErrorHandler<BookingEnquiryFormValues>>[0]) => {
+      const invalidFields = BOOKING_ENQUIRY_FIELD_NAMES.filter(
+        (name) => !!errors[name],
+      );
+      if (invalidFields.length > 0) {
+        setShowErrorSummary(true);
+        focusErrorSummary();
+      }
+    },
+  );
 
-  const fieldLocked = pending || failure === "ambiguous" || failure === "conflict";
+  const fieldLocked =
+    pending || failure === "ambiguous" || failure === "conflict" || !!receipt;
+  const fieldError = (name: BookingEnquiryFieldName) =>
+    form.formState.errors[name]?.message;
+
   const failureCopy = failure
     ? {
         storage: copy.storageFailure,
@@ -360,10 +360,10 @@ export function BookingEnquirySection({
     <section
       id={BOOKING_ENQUIRY_ANCHOR}
       aria-labelledby={`${BOOKING_ENQUIRY_ANCHOR}-heading`}
-      className="scroll-mt-8 bg-background px-4 py-10 sm:px-6 sm:py-16"
+      className="scroll-mt-8 bg-background px-4 py-8 sm:px-6 sm:py-12"
     >
       <div className="mx-auto max-w-2xl">
-        <div className="space-y-3">
+        <div className="space-y-2">
           <h2
             ref={headingRef}
             id={`${BOOKING_ENQUIRY_ANCHOR}-heading`}
@@ -372,19 +372,19 @@ export function BookingEnquirySection({
           >
             {copy.heading}
           </h2>
-          <p className="max-w-prose text-base leading-relaxed text-muted-foreground">
+          <p className="max-w-prose text-sm leading-relaxed text-muted-foreground sm:text-base">
             {copy.introduction}
           </p>
         </div>
 
-        <div className="mt-6 rounded-xl border border-border/80 bg-card/60 p-4 sm:p-5 shadow-xs transition-colors">
-          <div className="flex items-start gap-3.5">
-            <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <Compass aria-hidden="true" className="size-5" />
+        <div className="mt-4 rounded-xl border border-border/70 bg-card/60 p-4 transition-colors">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+              <Compass aria-hidden="true" className="size-4" />
             </div>
-            <div className="space-y-1">
-              <p className="text-base font-semibold tracking-tight text-foreground">{tour.title}</p>
-              <p className="text-sm leading-relaxed text-muted-foreground">{tour.summary}</p>
+            <div className="space-y-0.5">
+              <p className="text-sm font-semibold tracking-tight text-foreground">{tour.title}</p>
+              <p className="text-xs leading-relaxed text-muted-foreground">{tour.summary}</p>
             </div>
           </div>
         </div>
@@ -393,57 +393,71 @@ export function BookingEnquirySection({
           <div
             role="status"
             aria-live="polite"
-            className="mt-4 sm:mt-5 rounded-2xl border border-emerald-500/20 bg-card p-6 shadow-sm sm:p-8 space-y-6"
+            className="mt-4 rounded-2xl border border-emerald-500/25 bg-card p-6 shadow-xs sm:p-7 space-y-5"
           >
             <div className="flex items-center gap-3">
               <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 ring-4 ring-emerald-500/5">
                 <CheckCircle2 aria-hidden="true" className="size-5" />
               </div>
-              <h3 className="text-xl font-bold tracking-tight text-foreground sm:text-2xl">
-                {copy.receipt.heading}
-              </h3>
+              <div>
+                <h3 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
+                  {copy.receipt.heading}
+                </h3>
+                <p className="text-xs text-muted-foreground">Phá Tam Giang — Tour Chú Huyền</p>
+              </div>
             </div>
-            
-            <div className="space-y-3">
-              <p className="text-base leading-relaxed text-muted-foreground">
+
+            <div className="space-y-2.5">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {copy.receipt.message}
               </p>
-              <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-4 py-3">
-                <p className="text-sm font-medium text-amber-900 dark:text-amber-200">
+              <div className="rounded-lg border border-amber-500/20 bg-amber-500/10 px-3.5 py-2.5">
+                <p className="text-xs sm:text-sm font-medium text-amber-900 dark:text-amber-200">
                   {copy.receipt.notConfirmed}
                 </p>
               </div>
             </div>
 
-            <dl className="grid gap-3.5 rounded-xl border border-border/80 bg-muted/40 p-4.5 sm:grid-cols-2">
-              <div className="space-y-1">
+            <dl className="grid gap-3 rounded-xl border border-border/80 bg-muted/30 p-4 sm:grid-cols-2">
+              <div className="space-y-0.5">
                 <dt className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
                   {copy.receipt.requestedDateLabel}
                 </dt>
-                <dd className="text-base font-semibold text-foreground">
+                <dd className="text-sm font-semibold text-foreground">
                   {formatBookingEnquiryDate(receipt.requestedTourDate)}
                 </dd>
               </div>
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <dt className="text-xs font-medium tracking-wide uppercase text-muted-foreground">
                   {copy.receipt.guestCountLabel}
                 </dt>
-                <dd className="text-base font-semibold text-foreground">
+                <dd className="text-sm font-semibold text-foreground">
                   {receipt.totalGuestCount}
                 </dd>
               </div>
             </dl>
-            
+
             <p className="text-xs leading-relaxed text-muted-foreground italic">
               {copy.receipt.preferenceNote}
             </p>
+
+            <div className="border-t border-border/60 pt-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground">
+              <span>Cần hỗ trợ trực tiếp?</span>
+              <a
+                href={phone.href}
+                className="font-bold text-foreground hover:underline inline-flex items-center gap-1.5"
+              >
+                <Phone className="size-3.5 text-primary" aria-hidden="true" />
+                <span>Hotline: {phone.display}</span>
+              </a>
+            </div>
           </div>
         ) : (
           <Form {...form}>
             <form
               aria-label={copy.heading}
               aria-busy={pending}
-              className="mt-4 sm:mt-5 rounded-2xl border border-border bg-card p-6 shadow-sm sm:p-8 space-y-6"
+              className="mt-4 rounded-2xl border border-border/80 bg-card p-5 shadow-xs sm:p-7 space-y-4"
               noValidate
               onSubmit={handleSubmit}
             >
@@ -452,14 +466,14 @@ export function BookingEnquirySection({
                 ref={errorSummaryRef}
                 variant="destructive"
                 tabIndex={-1}
-                className="border-destructive/30 bg-destructive/5 text-destructive p-4 outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
+                className="border-destructive/30 bg-destructive/5 text-destructive p-3.5 rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-destructive focus-visible:ring-offset-2"
               >
                 <AlertCircle aria-hidden="true" className="size-4 text-destructive" />
-                <AlertTitle className="font-semibold tracking-tight">
+                <AlertTitle className="font-semibold tracking-tight text-sm">
                   {copy.errorSummaryHeading}
                 </AlertTitle>
-                <AlertDescription className="mt-2">
-                  <ul className="list-disc space-y-1.5 pl-5 text-sm">
+                <AlertDescription className="mt-1.5">
+                  <ul className="list-disc space-y-1 pl-4 text-xs sm:text-sm">
                     {summaryFields.map((name) => (
                       <li key={name}>
                         <a
@@ -494,11 +508,11 @@ export function BookingEnquirySection({
               name="requestedTourDate"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <BookingFieldHeading copy={copy.fields.requestedTourDate} id="requestedTourDate" requirementCopy={copy.requiredHint} />
+                  <BookingFieldHeading copy={copy.fields.requestedTourDate} id="requestedTourDate" isRequired />
                   <FormControl id="requestedTourDate">
                     <Input
                       {...field}
-                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      className="min-h-11 h-11 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="date"
                       required
                       disabled={fieldLocked}
@@ -509,7 +523,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.requestedTourDate} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1 leading-tight" />
                 </FormItem>
               )}
             />
@@ -519,11 +533,11 @@ export function BookingEnquirySection({
               name="totalGuestCount"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <BookingFieldHeading copy={copy.fields.totalGuestCount} id="totalGuestCount" requirementCopy={copy.requiredHint} />
+                  <BookingFieldHeading copy={copy.fields.totalGuestCount} id="totalGuestCount" isRequired />
                   <FormControl id="totalGuestCount">
                     <Input
                       {...field}
-                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      className="min-h-11 h-11 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="number"
                       inputMode="numeric"
                       min={1}
@@ -537,7 +551,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.totalGuestCount} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1 leading-tight" />
                 </FormItem>
               )}
             />
@@ -547,11 +561,11 @@ export function BookingEnquirySection({
               name="guestName"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <BookingFieldHeading copy={copy.fields.guestName} id="guestName" requirementCopy={copy.requiredHint} />
+                  <BookingFieldHeading copy={copy.fields.guestName} id="guestName" isRequired />
                   <FormControl id="guestName">
                     <Input
                       {...field}
-                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      className="min-h-11 h-11 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="text"
                       autoComplete="name"
                       maxLength={100}
@@ -564,7 +578,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.guestName} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1 leading-tight" />
                 </FormItem>
               )}
             />
@@ -574,11 +588,11 @@ export function BookingEnquirySection({
               name="phoneNumber"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <BookingFieldHeading copy={copy.fields.phoneNumber} id="phoneNumber" requirementCopy={copy.requiredHint} />
+                  <BookingFieldHeading copy={copy.fields.phoneNumber} id="phoneNumber" isRequired />
                   <FormControl id="phoneNumber">
                     <Input
                       {...field}
-                      className="min-h-11 px-3.5 py-2 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      className="min-h-11 h-11 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="tel"
                       inputMode="tel"
                       autoComplete="tel"
@@ -591,7 +605,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.phoneNumber} requirementCopy={copy.requiredHint} />
-                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1 leading-tight" />
                 </FormItem>
               )}
             />
@@ -601,11 +615,11 @@ export function BookingEnquirySection({
               name="guestNotes"
               render={({ field }) => (
                 <FormItem className="space-y-0">
-                  <BookingFieldHeading copy={copy.fields.guestNotes} id="guestNotes" requirementCopy={copy.optionalHint} />
+                  <BookingFieldHeading copy={copy.fields.guestNotes} id="guestNotes" isRequired={false} />
                   <FormControl id="guestNotes">
                     <Textarea
                       {...field}
-                      className="min-h-28 px-3.5 py-2.5 text-base md:text-sm bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
+                      className="min-h-24 h-24 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       maxLength={1_000}
                       disabled={fieldLocked}
                       onChange={(event) => {
@@ -615,7 +629,7 @@ export function BookingEnquirySection({
                     />
                   </FormControl>
                   <BookingFieldDescription copy={copy.fields.guestNotes} requirementCopy={copy.optionalHint} />
-                  <FormMessage className="text-xs font-medium text-destructive mt-1.5 leading-tight" />
+                  <FormMessage className="text-xs font-medium text-destructive mt-1 leading-tight" />
                 </FormItem>
               )}
             />
@@ -628,7 +642,7 @@ export function BookingEnquirySection({
             ) : null}
 
             {failureCopy ? (
-              <Alert className="border-border bg-muted/40 p-4.5">
+              <Alert className="border-border bg-muted/40 p-4 rounded-lg">
                 <AlertCircle aria-hidden="true" className="size-4 text-foreground" />
                 <AlertTitle className="font-semibold tracking-tight text-foreground">
                   {failureCopy.heading}
@@ -642,7 +656,7 @@ export function BookingEnquirySection({
                   >
                     <a
                       href={phone.href}
-                      onClick={() => analytics.trackContact("phone", "tour_detail", "vi")}
+                      onClick={() => analytics.trackContact("phone", "booking", "vi")}
                     >
                       <Phone aria-hidden="true" className="size-3.5 mr-1 text-muted-foreground inline" />
                       {copy.phoneFallback}: {phone.display}

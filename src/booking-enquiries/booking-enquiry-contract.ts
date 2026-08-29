@@ -97,8 +97,10 @@ export function tourLocalDate(date: Date) {
   return `${part("year")}-${part("month")}-${part("day")}`;
 }
 
-export function formatBookingEnquiryDate(value: string) {
+export function formatBookingEnquiryDate(value?: string) {
+  if (!value) return "";
   const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return value;
   return new Intl.DateTimeFormat("vi-VN", {
     timeZone: "UTC",
     year: "numeric",
