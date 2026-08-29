@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const TOUR_DETAIL_PATH = "/vi/trai-nghiem-pha-tam-giang";
+const BOOKING_PATH = "/vi/dat-trai-nghiem";
 
 const validFormData = {
   date: "2026-08-29",
@@ -10,21 +11,19 @@ const validFormData = {
   notes: "Gia đình có 1 bé nhỏ",
 };
 
-test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
-  test("CTA → enquiry anchor focuses heading without auto-focusing inputs", async ({
+test.describe("Vietnamese Booking Enquiry Journey", () => {
+  test("Tour detail CTA navigates to dedicated booking page", async ({
     page,
   }) => {
     await page.goto(TOUR_DETAIL_PATH);
 
-    const heading = page.locator("#booking-enquiry-heading");
-    await expect(heading).toBeAttached();
-
     const cta = page.getByRole("link", { name: "Gửi yêu cầu đặt trải nghiệm" }).first();
-    await expect(cta).toHaveAttribute("href", "#booking-enquiry");
+    await expect(cta).toHaveAttribute("href", BOOKING_PATH);
     await cta.click();
 
-    await expect(page).toHaveURL(`${TOUR_DETAIL_PATH}#booking-enquiry`);
-    await expect(heading).toBeFocused();
+    await expect(page).toHaveURL(BOOKING_PATH);
+    const heading = page.locator("#booking-enquiry-heading");
+    await expect(heading).toBeAttached();
 
     // Verify inputs remain blank and are not focused
     const dateInput = page.locator('input[name="requestedTourDate"]');
@@ -32,17 +31,17 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
     await expect(dateInput).not.toBeFocused();
   });
 
-  test("direct anchored visit focuses section heading and renders compact context", async ({
+  test("direct booking page visit renders compact context and fields in order", async ({
     page,
   }) => {
-    await page.goto(`${TOUR_DETAIL_PATH}#booking-enquiry`);
+    await page.goto(BOOKING_PATH);
 
     const heading = page.locator("#booking-enquiry-heading");
-    await expect(heading).toBeFocused();
+    await expect(heading).toBeAttached();
 
     // Verify compact tour context is visible
     await expect(
-      page.getByText("Gửi ngày bạn muốn đi và số lượng khách. Đây là yêu cầu đặt trải nghiệm, chưa phải xác nhận đặt chỗ."),
+      page.getByText("Trải nghiệm Phá Tam Giang").first(),
     ).toBeVisible();
 
     // Verify fields rendered in approved mobile order
@@ -64,7 +63,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       await route.fulfill({ status: 500, json: { error: "Should not be called" } });
     });
 
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     // Submit empty form
     const submitBtn = page.getByRole("button", { name: "Gửi yêu cầu đặt trải nghiệm" });
@@ -106,7 +105,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       });
     });
 
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     // Fill valid data
     await page.fill('input[name="requestedTourDate"]', validFormData.date);
@@ -130,7 +129,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
 
     expect(capturedPayload).toMatchObject({
       locale: "vi",
-      sourcePage: "tour_detail",
+      sourcePage: "booking",
       requestedTourDate: validFormData.date,
       totalGuestCount: 2,
       guestName: validFormData.name,
@@ -160,7 +159,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       }
     });
 
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     await page.fill('input[name="requestedTourDate"]', validFormData.date);
     await page.fill('input[name="totalGuestCount"]', validFormData.guests);
@@ -206,7 +205,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       }
     });
 
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     await page.fill('input[name="requestedTourDate"]', validFormData.date);
     await page.fill('input[name="totalGuestCount"]', validFormData.guests);
@@ -235,7 +234,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
   test("keyboard focus behavior allows full navigation and error recovery", async ({
     page,
   }) => {
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     // Focus and click the error summary link to jump to field
     await page.getByRole("button", { name: "Gửi yêu cầu đặt trải nghiệm" }).click();
@@ -262,7 +261,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       });
     });
 
-    await page.goto(`${TOUR_DETAIL_PATH}?utm_source=google&utm_campaign=summer_sale`);
+    await page.goto(`${BOOKING_PATH}?utm_source=google&utm_campaign=summer_sale`);
 
     // Verify consent banner appears
     const banner = page.locator('[role="region"][aria-label="Tùy chọn quyền riêng tư"]');
@@ -284,7 +283,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
 
     // Attribution is normalized and contains NO raw UTM parameters
     expect(capturedPayload).toMatchObject({
-      landingPageKey: "tour_detail",
+      landingPageKey: "booking",
       acquisitionSource: "google_search",
     });
     expect(capturedPayload).not.toHaveProperty("utm_campaign");
@@ -303,7 +302,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
       });
     });
 
-    await page.goto(`${TOUR_DETAIL_PATH}?utm_source=google`);
+    await page.goto(`${BOOKING_PATH}?utm_source=google`);
 
     // Click "Từ chối"
     const banner = page.locator('[role="region"][aria-label="Tùy chọn quyền riêng tư"]');
@@ -327,7 +326,7 @@ test.describe("Vietnamese Tour Detail — Booking Enquiry Journey", () => {
   test("floating Zalo contact button opens approved Zalo link in new tab", async ({
     page,
   }) => {
-    await page.goto(TOUR_DETAIL_PATH);
+    await page.goto(BOOKING_PATH);
 
     const zaloButton = page.getByRole("link", { name: /Chat qua Zalo/i });
     await expect(zaloButton).toBeVisible();

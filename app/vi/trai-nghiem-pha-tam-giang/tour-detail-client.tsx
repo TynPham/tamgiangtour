@@ -1,12 +1,14 @@
 "use client";
 
+import type { ComponentPropsWithoutRef } from "react";
 import { useEffect } from "react";
-import { ArrowDown } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { ArrowRight } from "lucide-react";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { analytics } from "@/src/analytics/analytics-client";
 import type { BookingEnquiryAnalyticsEvent } from "@/src/booking-enquiries/booking-enquiry-contract";
 import { VIETNAMESE_TOUR_CONTEXT } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
-
 import { hasAnalyticsConsent } from "@/src/analytics/consent";
 
 export function TourDetailPageViewTracker() {
@@ -36,11 +38,17 @@ export function TourDetailPageViewTracker() {
   return null;
 }
 
-export function TourDetailPrimaryCta() {
+export function TourDetailPrimaryCta({
+  className,
+  children,
+}: {
+  className?: string;
+  children?: React.ReactNode;
+}) {
   const handleClick = () => {
     analytics.trackPrimaryCta(
       "enquiry_start",
-      "booking_enquiry_section",
+      "booking_enquiry_page",
       "tour_detail",
       "vi",
     );
@@ -50,14 +58,58 @@ export function TourDetailPrimaryCta() {
     <Button
       asChild
       size="lg"
-      className="min-h-12 w-full px-7 text-base font-semibold shadow-sm sm:w-auto"
+      className={cn("min-h-12 w-full px-7 text-base font-semibold shadow-sm sm:w-auto", className)}
       onClick={handleClick}
     >
-      <a href="#booking-enquiry">
-        Gửi yêu cầu đặt trải nghiệm
-        <ArrowDown aria-hidden="true" className="ml-2 size-4" />
-      </a>
+      <Link href="/vi/dat-trai-nghiem">
+        {children ?? (
+          <>
+            Gửi yêu cầu đặt trải nghiệm
+            <ArrowRight aria-hidden="true" className="ml-2 size-4" />
+          </>
+        )}
+      </Link>
     </Button>
+  );
+}
+
+export function TourDetailContactLink({
+  kind,
+  href,
+  meetingPointKey,
+  variant = "default",
+  className,
+  children,
+  onClick,
+  ...props
+}: ComponentPropsWithoutRef<"a"> & {
+  kind: "phone" | "zalo" | "maps";
+  href: string;
+  meetingPointKey?: string;
+  variant?: "default" | "outline" | "secondary" | "ghost" | "link";
+}) {
+  const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
+    if (kind === "phone" || kind === "zalo") {
+      analytics.trackContact(kind, "tour_detail", "vi");
+    } else if (kind === "maps") {
+      analytics.trackMaps(meetingPointKey || "chu_huyen_boat_pier", "tour_detail", "vi");
+    }
+    onClick?.(event);
+  };
+
+  const isExternal = kind === "zalo" || kind === "maps";
+
+  return (
+    <a
+      href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
+      onClick={handleClick}
+      className={cn(buttonVariants({ variant }), className)}
+      {...props}
+    >
+      {children}
+    </a>
   );
 }
 

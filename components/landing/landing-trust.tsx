@@ -17,7 +17,7 @@ export function LandingTrust() {
   const { trust, contact } = LANDING_PAGE_CONTENT;
 
   const handleMapsClick = () => {
-    analytics.trackMaps(contact.mapsPlaceName, "home", "vi");
+    analytics.trackMaps(contact.mapsPlaceKey, "home", "vi");
   };
 
   return (

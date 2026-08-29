@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowDown, ArrowRight, MessageCircle } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, MessageCircle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { analytics } from "@/src/analytics/analytics-client";
@@ -12,7 +13,7 @@ export function LandingHeroActions() {
   const handlePrimaryCtaClick = () => {
     analytics.trackPrimaryCta(
       "enquiry_start",
-      "booking_enquiry_section",
+      "booking_enquiry_page",
       "home",
       "vi",
     );
@@ -30,10 +31,10 @@ export function LandingHeroActions() {
         className="min-h-12 rounded-md border-[var(--lagoon-sun)] bg-[var(--lagoon-sun)] px-6 text-sm font-bold text-[var(--lagoon-ink)] shadow-none hover:bg-[var(--lagoon-sun-soft)]"
         onClick={handlePrimaryCtaClick}
       >
-        <a href="#booking-enquiry">
+        <Link href="/vi/dat-trai-nghiem">
           {hero.primaryCtaText}
-          <ArrowDown className="ml-1.5 size-4" aria-hidden="true" />
-        </a>
+          <ArrowRight className="ml-1.5 size-4" aria-hidden="true" />
+        </Link>
       </Button>
 
       <Button
@@ -42,10 +43,10 @@ export function LandingHeroActions() {
         size="lg"
         className="min-h-12 rounded-md border-white/55 bg-black/12 px-5 text-sm font-semibold text-white shadow-none hover:border-white hover:bg-white/12 hover:text-white"
       >
-        <a href="#lich-trinh">
+        <Link href="/vi/trai-nghiem-pha-tam-giang">
           {hero.secondaryCtaText}
           <ArrowRight className="ml-1.5 size-4" aria-hidden="true" />
-        </a>
+        </Link>
       </Button>
 
       <a

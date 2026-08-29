@@ -1,13 +1,14 @@
 // @vitest-environment jsdom
 
 import "@testing-library/jest-dom/vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import VietnameseLandingPage, { metadata } from "./page";
 
 describe("Vietnamese Landing Page (/vi)", () => {
-  it("renders the main heading, sections, and canonical metadata", () => {
+  it("renders the main heading, sections, booking CTA to dedicated route, and canonical metadata", () => {
     render(<VietnameseLandingPage />);
+    const main = within(screen.getByRole("main"));
 
     // 1. Single H1 in hero
     expect(
@@ -77,12 +78,11 @@ describe("Vietnamese Landing Page (/vi)", () => {
       })
     ).toBeInTheDocument();
 
-    // 4. Booking enquiry section presence
-    expect(
-      screen.getByRole("heading", {
-        name: /Gửi yêu cầu đặt trải nghiệm/i,
-      })
-    ).toBeInTheDocument();
+    // 4. Primary CTA links to dedicated booking page /vi/dat-trai-nghiem
+    const ctaLink = main.getByRole("link", {
+      name: /Gửi yêu cầu đặt trải nghiệm/i,
+    });
+    expect(ctaLink).toHaveAttribute("href", "/vi/dat-trai-nghiem");
 
     // 5. Canonical metadata check
     expect(metadata.alternates?.canonical).toBe("/vi");
