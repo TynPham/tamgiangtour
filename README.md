@@ -109,7 +109,7 @@ Do not claim this check is complete until an authorized PostHog administrator ve
 
 If meta-tag verification is used, set `GOOGLE_SITE_VERIFICATION` to the token value supplied by Google (not the full HTML tag), deploy, and verify the tag on the production home page. Then submit:
 
-`https://tamgiangtour.vn/sitemap.xml`
+`https://tamgiangtour-ten.vercel.app/sitemap.xml`
 
 No placeholder verification token is shipped.
 

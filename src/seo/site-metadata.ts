@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 
-export const SITE_URL = "https://tamgiangtour.vn";
+export const SITE_URL = "https://tamgiangtour-ten.vercel.app";
 export const SITE_NAME = "Phá Tam Giang - Tour Gia đình Chú Huyền";
 export const DEFAULT_SOCIAL_IMAGE = "/images/tamgiang/hero-sunset.jpg";
+
+export function createAbsoluteSiteUrl(path: `/${string}`): string {
+  return new URL(path, SITE_URL).toString();
+}
 
 export function createVietnamesePageMetadata({
   path,
@@ -15,7 +19,7 @@ export function createVietnamesePageMetadata({
   description: string;
   imageAlt: string;
 }): Metadata {
-  const url = new URL(path, SITE_URL).toString();
+  const url = createAbsoluteSiteUrl(path);
   const images = [
     {
       url: DEFAULT_SOCIAL_IMAGE,

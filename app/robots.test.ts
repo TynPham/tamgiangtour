@@ -10,7 +10,7 @@ describe("production robots directives", () => {
         allow: "/",
         disallow: ["/api/", "/dev/"],
       },
-      sitemap: "https://tamgiangtour.vn/sitemap.xml",
+      sitemap: "https://tamgiangtour-ten.vercel.app/sitemap.xml",
     });
   });
 });

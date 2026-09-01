@@ -15,7 +15,7 @@ describe("public Vietnamese page metadata", () => {
     expect(metadata.openGraph).toMatchObject({
       title: "Liên hệ & Điểm gặp",
       description: "Liên hệ trực tiếp với gia đình Chú Huyền.",
-      url: "https://tamgiangtour.vn/vi/lien-he",
+      url: "https://tamgiangtour-ten.vercel.app/vi/lien-he",
       locale: "vi_VN",
       type: "website",
     });

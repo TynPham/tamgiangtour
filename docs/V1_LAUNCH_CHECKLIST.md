@@ -34,7 +34,7 @@ Record the verifier and date beside each production-only check. Repository tests
 - [ ] `/robots.txt` permits public pages and excludes `/api/` and `/dev/`.
 - [ ] `/dev/booking-enquiry-preview` is unavailable in production and carries noindex protections.
 - [ ] Search Console ownership is verified with the real production token. Verifier/date: __________
-- [ ] `https://tamgiangtour.vn/sitemap.xml` is submitted in Search Console.
+- [ ] `https://tamgiangtour-ten.vercel.app/sitemap.xml` is submitted in Search Console.
 
 ## Security and operations
 

@@ -6,6 +6,7 @@ import {
   type MeetingPoint,
 } from "@/src/content/v1-tour";
 import { V1_TOUR_VI } from "@/src/content/v1-tour-vi";
+import { createAbsoluteSiteUrl } from "@/src/seo/site-metadata";
 
 export interface NavigationItem {
   label: string;
@@ -220,7 +221,7 @@ export const LANDING_PAGE_CONTENT = {
       "đổ nò tam giang",
       "tour chú huyền tam giang",
     ],
-    canonicalUrl: "https://tamgiangtour.vn/vi",
+    canonicalUrl: createAbsoluteSiteUrl("/vi"),
     ogImage: "/images/tamgiang/hero-sunset.jpg",
   },
   navigation: {
