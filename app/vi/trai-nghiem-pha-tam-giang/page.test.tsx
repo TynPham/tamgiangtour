@@ -16,8 +16,8 @@ afterEach(() => {
 });
 
 describe("Vietnamese Tour Detail Page", () => {
-  it("renders tour title, primary CTA linking to dedicated booking page, key sections, and Maps link", () => {
-    const { contact, highlights } = LANDING_PAGE_CONTENT;
+  it("renders the canonical tour contract and keeps the dedicated booking journey", () => {
+    const { contact, highlights, policies } = LANDING_PAGE_CONTENT;
     render(<VietnameseTourDetailPage />);
     const main = within(screen.getByRole("main"));
 
@@ -52,10 +52,28 @@ describe("Vietnamese Tour Detail Page", () => {
     ).toBeInTheDocument();
 
     // 5. Maps destination link with verified URL
-    const mapsLink = main.getByRole("link", {
-      name: /Mở Google Maps/i,
-    });
-    expect(mapsLink).toHaveAttribute("href", contact.mapsHref);
+    for (const point of contact.meetingPoints) {
+      expect(
+        main.getByRole("link", {
+          name: point.role === "primary" ? /Mở điểm chính/i : /Mở điểm thay thế/i,
+        }),
+      ).toHaveAttribute("href", point.mapsHref);
+      expect(main.getByText(new RegExp(point.name))).toBeInTheDocument();
+    }
+
+    expect(main.getAllByText("350.000đ/người").length).toBeGreaterThan(0);
+    expect(main.getAllByText("500.000đ/người").length).toBeGreaterThan(0);
+    expect(main.getAllByText(/3–4 giờ/i).length).toBeGreaterThan(0);
+    expect(main.getByText(/không phải giờ vận hành cố định/i)).toBeInTheDocument();
+    expect(main.getByText(policies.deposit)).toBeInTheDocument();
+    expect(main.getByText(new RegExp(policies.changeOrCancel))).toBeInTheDocument();
+    expect(main.getByRole("heading", { name: /Cùng gia đình Chú Huyền/i })).toBeInTheDocument();
+    expect(main.getByRole("heading", { name: /Câu hỏi thường gặp/i })).toBeInTheDocument();
+    expect(main.getByText("Nếu hủy hoặc đổi ngày thì sao?")).toBeInTheDocument();
+    expect(main.getByText("Điều gì xảy ra sau khi gửi yêu cầu?")).toBeInTheDocument();
+    expect(main.getByText("Các mốc giờ trong lịch trình có cố định không?")).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(/— Gia đình Chú Huyền|điểm đón|chuẩn bị chu đáo/i);
+    expect(document.body).not.toHaveTextContent(/cất rớ|thả lưới|15–20km|30–40 phút|Không cần thanh toán trước|giá trẻ em|biết bơi|phụ nữ mang thai|người cao tuổi/i);
 
     // 6. Closing booking CTA banner
     expect(

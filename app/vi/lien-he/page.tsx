@@ -21,21 +21,24 @@ import {
 } from "@/components/site/site-primitives";
 import { Button } from "@/components/ui/button";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
+import { createVietnamesePageMetadata } from "@/src/seo/site-metadata";
 
 const TOUR_DETAIL_HREF = "/vi/trai-nghiem-pha-tam-giang";
 const BOOKING_ENQUIRY_HREF = "/vi/dat-trai-nghiem";
 
-export const metadata: Metadata = {
-  title: "Liên hệ & Điểm đón",
+export const metadata: Metadata = createVietnamesePageMetadata({
+  path: "/vi/lien-he",
+  title: "Liên hệ & Điểm gặp",
   description:
-    "Liên hệ trực tiếp và mở điểm đón Tour Du Lịch Phá Tam Giang - Chú Huyền trên Google Maps.",
-  alternates: {
-    canonical: "/vi/lien-he",
-  },
-};
+    "Liên hệ trực tiếp và mở điểm gặp Tour Du Lịch Phá Tam Giang - Chú Huyền trên Google Maps.",
+  imageAlt: LANDING_PAGE_CONTENT.hero.heroImageAlt,
+});
 
 export default function VietnameseContactPage() {
   const { contact } = LANDING_PAGE_CONTENT;
+  const alternateMeetingPoint = contact.meetingPoints.find(
+    (point) => point.role === "alternate",
+  );
 
   return (
     <div className="tam-giang-site flex min-h-screen flex-col overflow-x-clip bg-background text-foreground selection:bg-primary/20 selection:text-foreground">
@@ -68,7 +71,7 @@ export default function VietnameseContactPage() {
                 {contact.heading}
               </h1>
               <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-base">
-                {contact.subheading}. Bạn có thể gọi điện trực tiếp, nhắn tin Zalo hoặc xem vị trí bến thuyền trên bản đồ bên dưới trước khi khởi hành.
+                {contact.subheading}. Gia đình sẽ xác nhận điểm gặp phù hợp sau khi nhận yêu cầu của khách.
               </p>
             </ScrollReveal>
           </div>
@@ -91,7 +94,7 @@ export default function VietnameseContactPage() {
                     Trao đổi trực tiếp với gia đình
                   </h2>
                   <p className="text-xs sm:text-sm leading-relaxed text-muted-foreground">
-                    Gọi điện hoặc nhắn tin Zalo để hỏi thêm về con nước, thời gian xuất bến hoặc thông báo trước khi đến.
+                    Gọi điện hoặc nhắn tin Zalo để trao đổi trước khi gửi yêu cầu hoặc khởi hành.
                   </p>
                 </div>
 
@@ -116,20 +119,37 @@ export default function VietnameseContactPage() {
                 </div>
               </div>
 
-              {/* Travel Directions Guide */}
+              {/* Meeting points */}
               <div className="space-y-3 rounded-2xl border border-border/80 bg-muted/30 p-5 sm:p-6 text-xs sm:text-sm text-muted-foreground shadow-xs">
                 <div className="flex items-center gap-2">
                   <Navigation className="size-4 text-primary shrink-0" aria-hidden="true" />
                   <h3 className="font-sans font-bold text-foreground text-sm">
-                    Hướng dẫn di chuyển từ TP. Huế:
+                    Hai điểm gặp trên Google Maps
                   </h3>
                 </div>
                 <p className="leading-relaxed text-xs sm:text-sm">
                   {contact.directionsTip}
                 </p>
-                <p className="border-t border-border/60 pt-3 text-[11px] text-muted-foreground">
-                  Khoảng cách: ~15–20km (30–40 phút di chuyển bằng xe máy hoặc taxi).
-                </p>
+                <div className="space-y-3 border-t border-border/60 pt-3">
+                  {contact.meetingPoints.map((point) => (
+                    <div key={point.key} className="space-y-1">
+                      <p className="font-semibold text-foreground">
+                        {point.roleLabel}: {point.name}
+                      </p>
+                      <p>{point.parkingText}. Khách tự di chuyển đến điểm đã thống nhất.</p>
+                      <ContactActionLink
+                        kind="maps"
+                        href={point.mapsHref}
+                        meetingPointKey={point.key}
+                        variant="outline"
+                        className="mt-2 min-h-11 w-full justify-center px-4 text-xs font-semibold"
+                      >
+                        <Navigation className="mr-2 size-4" aria-hidden="true" />
+                        Mở {point.name} trên Google Maps
+                      </ContactActionLink>
+                    </div>
+                  ))}
+                </div>
               </div>
             </ScrollReveal>
 
@@ -146,6 +166,11 @@ export default function VietnameseContactPage() {
                 showDirectionsButton={true}
                 directionsButtonLabel="Mở chỉ đường trên Google Maps"
               />
+              {alternateMeetingPoint && (
+                <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+                  Bản đồ nhúng hiển thị điểm hẹn chính. Điểm hẹn thay thế là {alternateMeetingPoint.name}; gia đình sẽ xác nhận điểm áp dụng cho chuyến đi.
+                </p>
+              )}
             </ScrollReveal>
           </div>
         </SiteContainer>

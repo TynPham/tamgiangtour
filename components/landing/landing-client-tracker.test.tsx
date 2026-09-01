@@ -7,10 +7,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { LandingPageViewTracker } from "./landing-client-tracker";
 import { analytics } from "@/src/analytics/analytics-client";
 import { setAnalyticsConsent } from "@/src/analytics/consent";
+import { readFirstTouchAttribution } from "@/src/analytics/attribution";
 
 describe("LandingPageViewTracker", () => {
   beforeEach(() => {
     window.localStorage.clear();
+    window.sessionStorage.clear();
     vi.restoreAllMocks();
   });
 
@@ -46,6 +48,15 @@ describe("LandingPageViewTracker", () => {
 
     expect(trackSpy).toHaveBeenCalledTimes(1);
     expect(trackSpy).toHaveBeenCalledWith("home", "vi");
+    expect(
+      readFirstTouchAttribution({
+        hasConsent: true,
+        storage: window.sessionStorage,
+      }),
+    ).toEqual({
+      landing_page_key: "home",
+      acquisition_source: "direct",
+    });
   });
 
   it("does not emit page_viewed when visitor denies consent", () => {

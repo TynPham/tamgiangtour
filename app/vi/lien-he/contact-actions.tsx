@@ -1,11 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useEffect } from "react";
 
 import { Button } from "@/components/ui/button";
 import { analytics } from "@/src/analytics/analytics-client";
-import { hasAnalyticsConsent } from "@/src/analytics/consent";
+import { useConsentedPageView } from "@/src/analytics/use-consented-page-view";
 
 type ContactActionKind = "phone" | "zalo" | "maps";
 
@@ -59,28 +58,7 @@ export function ContactActionLink({
 }
 
 export function ContactPageViewTracker() {
-  useEffect(() => {
-    let tracked = false;
-
-    if (hasAnalyticsConsent()) {
-      analytics.trackPageView("contact", "vi");
-      tracked = true;
-      return;
-    }
-
-    const handleConsentChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ consent: string }>;
-      if (customEvent.detail?.consent === "granted" && !tracked) {
-        analytics.trackPageView("contact", "vi");
-        tracked = true;
-      }
-    };
-
-    window.addEventListener("tamgiang:consent_changed", handleConsentChange);
-    return () => {
-      window.removeEventListener("tamgiang:consent_changed", handleConsentChange);
-    };
-  }, []);
+  useConsentedPageView("contact");
 
   return null;
 }

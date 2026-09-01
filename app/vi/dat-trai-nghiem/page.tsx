@@ -12,32 +12,27 @@ import {
 } from "@/components/site/site-primitives";
 import { Badge } from "@/components/ui/badge";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
+import { createVietnamesePageMetadata } from "@/src/seo/site-metadata";
 import {
   BookingContactLink,
   BookingEnquiryFormContainer,
   BookingPageViewTracker,
 } from "./booking-page-client";
 
-export const metadata: Metadata = {
-  title: "Gửi yêu cầu đặt trải nghiệm | Tour Phá Tam Giang - Chú Huyền",
-  description:
-    "Gửi thông tin ngày mong muốn và số lượng khách để trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân Chú Huyền. Gia đình sẽ liên hệ xác nhận trực tiếp.",
-  alternates: {
-    canonical: "/vi/dat-trai-nghiem",
-  },
-  openGraph: {
-    title: "Gửi yêu cầu đặt trải nghiệm | Tour Phá Tam Giang - Chú Huyền",
-    description:
-      "Gửi thông tin ngày mong muốn và số lượng khách để trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân Chú Huyền. Gia đình sẽ liên hệ xác nhận trực tiếp.",
-    url: "https://tamgiangtour.vn/vi/dat-trai-nghiem",
-    siteName: LANDING_PAGE_CONTENT.navigation.brandName,
-    locale: "vi_VN",
-    type: "website",
-  },
-};
+const BOOKING_PAGE_TITLE = "Gửi yêu cầu đặt trải nghiệm";
+const BOOKING_PAGE_DESCRIPTION =
+  "Gửi thông tin ngày mong muốn và số lượng khách để trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân Chú Huyền. Gia đình sẽ liên hệ xác nhận trực tiếp.";
+
+export const metadata: Metadata = createVietnamesePageMetadata({
+  path: "/vi/dat-trai-nghiem",
+  title: BOOKING_PAGE_TITLE,
+  description: BOOKING_PAGE_DESCRIPTION,
+  imageAlt: LANDING_PAGE_CONTENT.hero.heroImageAlt,
+});
 
 export default function VietnameseBookingEnquiryPage() {
-  const { contact } = LANDING_PAGE_CONTENT;
+  const { contact, gallery, pricing, tour } = LANDING_PAGE_CONTENT;
+  const bookingImage = gallery.photos.find((photo) => photo.id === "real-sup-activity");
 
   return (
     <div className="tam-giang-site flex min-h-screen flex-col overflow-x-clip bg-background text-foreground selection:bg-primary/20 selection:text-foreground">
@@ -53,7 +48,7 @@ export default function VietnameseBookingEnquiryPage() {
       </a>
 
       {/* 3. Shared Site Header */}
-      <SiteHeader pageKey="booking" primaryActionHref="/vi/dat-trai-nghiem" />
+      <SiteHeader pageKey="tour_detail" primaryActionHref="/vi/dat-trai-nghiem" />
 
       <main id="main-content" className="flex-1 py-10 sm:py-16 lg:py-20">
         <SiteContainer>
@@ -71,7 +66,7 @@ export default function VietnameseBookingEnquiryPage() {
                   Gửi yêu cầu đặt trải nghiệm
                 </h1>
                 <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-                  Điền ngày bạn dự kiến đi và số lượng khách. Gia đình Chú Huyền sẽ kiểm tra con nước, chuẩn bị thuyền và liên hệ lại trực tiếp để xác nhận.
+                  Điền ngày bạn dự kiến đi và số lượng khách. Gia đình Chú Huyền sẽ liên hệ lại trực tiếp để thống nhất chuyến đi và xác nhận đặt chỗ.
                 </p>
               </div>
 
@@ -87,10 +82,13 @@ export default function VietnameseBookingEnquiryPage() {
                 </div>
                 <div className="space-y-1">
                   <p className="font-sans text-base font-semibold text-foreground">
-                    Trải nghiệm Phá Tam Giang
+                    {tour.name}
                   </p>
                   <p className="text-xs text-muted-foreground">
-                    Khoảng 3.5 – 4 giờ · Bắt đầu khoảng 15:40 chiều
+                    Khoảng {tour.duration} · {tour.operatingWindow}
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    {pricing.options.map((option) => `${option.label} ${option.display}`).join(" · ")} · Tối thiểu {pricing.minimumGuests} khách
                   </p>
                 </div>
                 <p className="text-xs leading-relaxed text-muted-foreground/90 border-t border-border/60 pt-3">
@@ -101,8 +99,8 @@ export default function VietnameseBookingEnquiryPage() {
               {/* Authentic Experience Visual */}
               <div className="relative aspect-[16/10] overflow-hidden rounded-xl border border-border/70 bg-card shadow-xs">
                 <Image
-                  src="/images/tamgiang/sup-sunset.jpg"
-                  alt="Chèo SUP ngắm hoàng hôn rực rỡ trên phá Tam Giang"
+                  src={bookingImage?.src ?? LANDING_PAGE_CONTENT.hero.heroImage}
+                  alt={bookingImage?.alt ?? LANDING_PAGE_CONTENT.hero.heroImageAlt}
                   fill
                   sizes="(max-width: 1024px) 100vw, 40vw"
                   className="object-cover transition-transform duration-700 hover:scale-103"
@@ -110,7 +108,7 @@ export default function VietnameseBookingEnquiryPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-3 left-3 right-3 text-white">
                   <p className="text-xs font-medium text-white/95">
-                    Hoàng hôn rực rỡ trên Phá Tam Giang
+                    Hoạt động SUP phụ thuộc điều kiện thực tế
                   </p>
                 </div>
               </div>
@@ -118,7 +116,7 @@ export default function VietnameseBookingEnquiryPage() {
               {/* Direct Hotline / Zalo Fallback Path */}
               <div className="rounded-xl border border-border/60 bg-card/60 p-4 space-y-2">
                 <p className="text-xs font-semibold text-foreground">
-                  Cần hỗ trợ hoặc tư vấn gấp?
+                  Cần trao đổi trước khi gửi yêu cầu?
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <BookingContactLink
@@ -162,7 +160,7 @@ export default function VietnameseBookingEnquiryPage() {
       </main>
 
       {/* 4. Shared Site Footer */}
-      <SiteFooter pageKey="booking" />
+      <SiteFooter pageKey="tour_detail" />
     </div>
   );
 }

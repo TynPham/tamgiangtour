@@ -1,25 +1,31 @@
 "use client";
 
 import { useEffect } from "react";
-import posthog from "posthog-js";
+import { hasAnalyticsConsent } from "./consent";
+import { initializePostHog } from "./posthog-runtime";
 
-export function PostHogProvider({ children }: { children: React.ReactNode }) {
+export function PostHogProvider({
+  children,
+  initialize = initializePostHog,
+}: {
+  children: React.ReactNode;
+  initialize?: () => boolean;
+}) {
   useEffect(() => {
-    const posthogKey = process.env.NEXT_PUBLIC_POSTHOG_KEY;
-    const posthogHost = process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://us.i.posthog.com";
+    const initializeIfConsented = () => {
+      if (hasAnalyticsConsent()) initialize();
+    };
+    initializeIfConsented();
 
-    if (typeof window !== "undefined" && posthogKey && !posthog.__loaded) {
-      posthog.init(posthogKey, {
-        api_host: posthogHost,
-        autocapture: false,
-        capture_pageview: false,
-        capture_pageleave: false,
-        disable_session_recording: true,
-        person_profiles: "never",
-        persistence: "memory",
-      });
-    }
-  }, []);
+    const handleConsentChange = (event: Event) => {
+      const consentEvent = event as CustomEvent<{ consent?: string }>;
+      if (consentEvent.detail?.consent === "granted") initializeIfConsented();
+    };
+    window.addEventListener("tamgiang:consent_changed", handleConsentChange);
+    return () => {
+      window.removeEventListener("tamgiang:consent_changed", handleConsentChange);
+    };
+  }, [initialize]);
 
   return <>{children}</>;
 }

@@ -1,7 +1,6 @@
 "use client";
 
 import type { ComponentPropsWithoutRef } from "react";
-import { useEffect } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
@@ -9,31 +8,11 @@ import { cn } from "@/lib/utils";
 import { analytics } from "@/src/analytics/analytics-client";
 import type { BookingEnquiryAnalyticsEvent } from "@/src/booking-enquiries/booking-enquiry-contract";
 import { VIETNAMESE_TOUR_CONTEXT } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
-import { hasAnalyticsConsent } from "@/src/analytics/consent";
+import { useConsentedPageView } from "@/src/analytics/use-consented-page-view";
+import { PRIMARY_MEETING_POINT } from "@/src/content/v1-tour";
 
 export function TourDetailPageViewTracker() {
-  useEffect(() => {
-    let tracked = false;
-
-    if (hasAnalyticsConsent()) {
-      analytics.trackPageView("tour_detail", "vi");
-      tracked = true;
-      return;
-    }
-
-    const handleConsentChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ consent: string }>;
-      if (customEvent.detail?.consent === "granted" && !tracked) {
-        analytics.trackPageView("tour_detail", "vi");
-        tracked = true;
-      }
-    };
-
-    window.addEventListener("tamgiang:consent_changed", handleConsentChange);
-    return () => {
-      window.removeEventListener("tamgiang:consent_changed", handleConsentChange);
-    };
-  }, []);
+  useConsentedPageView("tour_detail");
 
   return null;
 }
@@ -92,7 +71,7 @@ export function TourDetailContactLink({
     if (kind === "phone" || kind === "zalo") {
       analytics.trackContact(kind, "tour_detail", "vi");
     } else if (kind === "maps") {
-      analytics.trackMaps(meetingPointKey || "chu_huyen_boat_pier", "tour_detail", "vi");
+      analytics.trackMaps(meetingPointKey || PRIMARY_MEETING_POINT.key, "tour_detail", "vi");
     }
     onClick?.(event);
   };

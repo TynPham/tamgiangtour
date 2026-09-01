@@ -19,7 +19,7 @@ const previewCopy: BookingEnquiryCopy = {
     },
     totalGuestCount: {
       label: "Total guests",
-      error: "Enter a whole number of at least one.",
+      error: "Enter a whole number of at least two.",
     },
     guestName: {
       label: "Guest name",

@@ -101,6 +101,24 @@ describe("booking enquiry submission boundary", () => {
     });
   });
 
+  it("rejects a one-guest enquiry before persistence", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const handler = createBookingEnquiryHandler({
+      store,
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(validRequest({ totalGuestCount: 1 }));
+
+    expect(response.status).toBe(422);
+    await expect(response.json()).resolves.toEqual({
+      outcome: "validation_failed",
+      invalidFields: ["totalGuestCount"],
+    });
+    expect(store.records).toHaveLength(0);
+  });
+
   it("rejects a requested date that is already past in Ho Chi Minh City", async () => {
     const store = new MemoryBookingEnquiryStore();
     const handler = createBookingEnquiryHandler({
@@ -152,6 +170,7 @@ describe("booking enquiry submission boundary", () => {
     const handler = createBookingEnquiryHandler({
       store,
       rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
     });
 
     const response = await handler(validRequest({ bookingStatus: "confirmed" }));
@@ -185,6 +204,7 @@ describe("booking enquiry submission boundary", () => {
     const handler = createBookingEnquiryHandler({
       store,
       rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
     });
 
     const response = await handler(validRequest({ website: "spam.example" }));
@@ -343,6 +363,25 @@ describe("booking enquiry submission boundary", () => {
       landingPageKey: "tour_detail",
       acquisitionSource: "google_search",
     });
+  });
+
+  it("rejects a booking-page label outside the canonical attribution vocabulary", async () => {
+    const store = new MemoryBookingEnquiryStore();
+    const handler = createBookingEnquiryHandler({
+      store,
+      rateLimiter: { allow: () => true },
+      now: () => new Date("2026-08-28T05:00:00.000Z"),
+    });
+
+    const response = await handler(
+      validRequest({
+        landingPageKey: "booking",
+        acquisitionSource: "direct",
+      }),
+    );
+
+    expect(response.status).toBe(422);
+    expect(store.records).toHaveLength(0);
   });
 
   it("rejects unrecognized raw attribution/UTM keys with invalid_request", async () => {

@@ -33,12 +33,22 @@ describe("Vietnamese Contact Page (/vi/lien-he)", () => {
     expect(mapIframe).toBeInTheDocument();
     expect(mapIframe).toHaveAttribute("src", contact.mapsEmbedUrl);
 
-    // 4. Secondary external directions link
+    // 4. Both approved meeting points are available without invented travel time
+    for (const point of contact.meetingPoints) {
+      expect(main.getAllByText(new RegExp(point.name)).length).toBeGreaterThan(0);
+      expect(
+        main.getByRole("link", { name: new RegExp(`Mở ${point.name}`) }),
+      ).toHaveAttribute("href", point.mapsHref);
+    }
+
+    // 5. Primary embedded-map directions link
     expect(
       main.getByRole("link", { name: /Mở chỉ đường trên Google Maps/i }),
     ).toHaveAttribute("href", contact.mapsHref);
 
-    // 5. Back navigation
+    expect(document.body).not.toHaveTextContent(/15–20km|30–40 phút|Quốc lộ 49B/i);
+
+    // 6. Back navigation
     expect(
       main.getByRole("link", { name: "Xem chi tiết trải nghiệm" }),
     ).toHaveAttribute("href", "/vi/trai-nghiem-pha-tam-giang");
@@ -46,7 +56,9 @@ describe("Vietnamese Contact Page (/vi/lien-he)", () => {
       main.getByRole("link", { name: "Gửi yêu cầu đặt trải nghiệm" }),
     ).toHaveAttribute("href", "/vi/dat-trai-nghiem");
 
-    // 6. Metadata
+    // 7. Metadata
     expect(metadata.alternates?.canonical).toBe("/vi/lien-he");
+    expect(metadata.title).toBe("Liên hệ & Điểm gặp");
+    expect(document.body).not.toHaveTextContent(/điểm đón/i);
   });
 });

@@ -74,7 +74,7 @@ export function MeetingPointMap({
       {showDirectionsButton && (
         <div className="flex flex-col items-stretch justify-between gap-3 border-t border-border/70 bg-muted/30 p-3.5 sm:flex-row sm:items-center sm:px-5 sm:py-3.5">
           <p className="text-xs text-muted-foreground">
-            Bến thuyền nằm trên đầm phá Tam Giang, thuận tiện đi lại từ TP. Huế.
+            Gia đình xác nhận điểm gặp phù hợp sau khi nhận yêu cầu của khách.
           </p>
           <a
             href={contact.mapsHref}

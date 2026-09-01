@@ -13,7 +13,7 @@ describe("Vietnamese Landing Page (/vi)", () => {
     // 1. Single H1 in hero
     expect(
       screen.getByRole("heading", {
-        name: /Khám phá Đầm phá Tam Giang cùng Ngư dân Bản địa/i,
+        name: /Khám phá Đầm phá Tam Giang cùng Chú Huyền/i,
         level: 1,
       })
     ).toBeInTheDocument();
@@ -31,7 +31,7 @@ describe("Vietnamese Landing Page (/vi)", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /Lịch trình trải nghiệm chi tiết/i,
+        name: /Lịch trình tham khảo/i,
         level: 2,
       })
     ).toBeInTheDocument();
@@ -45,7 +45,7 @@ describe("Vietnamese Landing Page (/vi)", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /Gia đình làng chài gắn bó cùng con nước Tam Giang/i,
+        name: /Cùng gia đình Chú Huyền tìm hiểu cuộc sống trên phá/i,
         level: 2,
       })
     ).toBeInTheDocument();
@@ -59,7 +59,7 @@ describe("Vietnamese Landing Page (/vi)", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /An tâm trọn vẹn khi trải nghiệm/i,
+        name: /Thông tin rõ ràng trước khi trải nghiệm/i,
         level: 2,
       })
     ).toBeInTheDocument();
@@ -73,7 +73,7 @@ describe("Vietnamese Landing Page (/vi)", () => {
 
     expect(
       screen.getByRole("heading", {
-        name: /Thông tin liên hệ & Điểm đón/i,
+        name: /Thông tin liên hệ & Điểm gặp/i,
         level: 2,
       })
     ).toBeInTheDocument();
@@ -83,6 +83,18 @@ describe("Vietnamese Landing Page (/vi)", () => {
       name: /Gửi yêu cầu đặt trải nghiệm/i,
     });
     expect(ctaLink).toHaveAttribute("href", "/vi/dat-trai-nghiem");
+
+    expect(main.getAllByText("350.000đ/người").length).toBeGreaterThan(0);
+    expect(main.getAllByText("500.000đ/người").length).toBeGreaterThan(0);
+    expect(main.getAllByText(/3–4 giờ/i).length).toBeGreaterThan(0);
+    expect(main.getAllByText(/không phải giờ vận hành cố định/i).length).toBeGreaterThan(0);
+    expect(main.getByRole("link", { name: /Bến đò Cồn Tộc/i })).toBeInTheDocument();
+    expect(main.getByText("Mỗi gói bao gồm những gì?")).toBeInTheDocument();
+    expect(main.getByText("Cần đặt cọc bao nhiêu?")).toBeInTheDocument();
+    expect(main.getByText("Chú Huyền là ai?")).toBeInTheDocument();
+    expect(main.getByText("SUP có luôn hoạt động không?")).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(/— Gia đình Chú Huyền|điểm đón|tư vấn gấp|chuẩn bị chu đáo|trọn vẹn nhất/i);
+    expect(document.body).not.toHaveTextContent(/cất rớ|thả lưới|15–20km|30–40 phút|giá trẻ em|biết bơi|phụ nữ mang thai|người cao tuổi/i);
 
     // 5. Canonical metadata check
     expect(metadata.alternates?.canonical).toBe("/vi");

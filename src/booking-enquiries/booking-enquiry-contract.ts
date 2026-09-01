@@ -1,5 +1,10 @@
 import { z } from "zod";
 
+import { V1_TOUR } from "@/src/content/v1-tour";
+
+export const BOOKING_ENQUIRY_MINIMUM_GUEST_COUNT =
+  V1_TOUR.pricing.minimumGuests;
+
 export const BOOKING_ENQUIRY_FIELD_NAMES = [
   "requestedTourDate",
   "totalGuestCount",
@@ -174,7 +179,7 @@ export function createBookingEnquiryFormSchema({
       if (
         values.totalGuestCount.trim() === "" ||
         !Number.isInteger(totalGuestCount) ||
-        totalGuestCount < 1
+        totalGuestCount < BOOKING_ENQUIRY_MINIMUM_GUEST_COUNT
       ) {
         addFieldIssue(context, "totalGuestCount", messages.totalGuestCount);
       }

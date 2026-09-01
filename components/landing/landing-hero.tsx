@@ -41,7 +41,7 @@ export function LandingHero() {
             <span className="hero-headline-line block text-[var(--lagoon-sun-soft)]">
               Tam Giang cùng
             </span>
-            <span className="hero-headline-line block">Ngư dân Bản địa</span>
+            <span className="hero-headline-line block">Chú Huyền</span>
           </h1>
 
           <div className="hero-support mt-6 grid max-w-[46rem] gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(15rem,0.72fr)] sm:gap-8">

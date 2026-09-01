@@ -21,8 +21,8 @@ export function LandingContact() {
     analytics.trackContact("zalo", "home", "vi");
   };
 
-  const handleMapsClick = () => {
-    analytics.trackMaps(contact.mapsPlaceKey, "home", "vi");
+  const handleMapsClick = (meetingPointKey: string) => {
+    analytics.trackMaps(meetingPointKey, "home", "vi");
   };
 
   return (
@@ -40,7 +40,7 @@ export function LandingContact() {
             className="max-w-[15ch] text-balance font-sans text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-4xl lg:text-5xl"
           >
             Thông tin liên hệ &{" "}
-            <span className="block sm:inline">Điểm đón</span>
+            <span className="block sm:inline">Điểm gặp</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl">
             {contact.subheading}
@@ -59,7 +59,7 @@ export function LandingContact() {
                 Hotline trực tiếp
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Trao đổi nhanh và nhận hỗ trợ chỉ đường trực tiếp từ chú Huyền.
+                Trao đổi trực tiếp với gia đình trước khi gửi yêu cầu hoặc khởi hành.
               </p>
             </div>
             <div>
@@ -87,7 +87,7 @@ export function LandingContact() {
                 Nhắn tin Zalo
               </h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                Gửi tin nhắn, hỏi giá tour theo nhóm hoặc nhận hình ảnh thực tế.
+                Nhắn cho gia đình qua số Zalo đã công bố.
               </p>
             </div>
             <div>
@@ -115,11 +115,9 @@ export function LandingContact() {
               <div className="flex size-10 items-center justify-center text-primary">
                 <MapPin className="size-5" aria-hidden="true" />
               </div>
-              <h3 className="font-sans text-lg font-bold text-foreground">
-                Bến thuyền Chú Huyền
-              </h3>
+              <h3 className="font-sans text-lg font-bold text-foreground">Hai điểm gặp</h3>
               <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                {contact.mapsAddress}
+                Gia đình xác nhận điểm phù hợp sau khi nhận yêu cầu.
               </p>
             </div>
             <div>
@@ -128,7 +126,7 @@ export function LandingContact() {
                 variant="outline"
                 size="lg"
                 className="w-full font-semibold text-xs sm:text-sm border-border hover:bg-muted/50 rounded-lg h-11"
-                onClick={handleMapsClick}
+                onClick={() => handleMapsClick(contact.mapsPlaceKey)}
               >
                 <a
                   href={contact.mapsHref}
@@ -147,10 +145,22 @@ export function LandingContact() {
         <ScrollReveal delay={220} direction="left" distance={22} className="flex max-w-5xl items-start gap-3.5 border-l-2 border-primary bg-background/55 px-5 py-5 text-xs text-muted-foreground sm:text-sm">
           <Navigation className="size-5 text-primary shrink-0 mt-0.5" aria-hidden="true" />
           <div className="space-y-1">
-            <p className="font-sans font-bold text-foreground text-sm">
-              Hướng dẫn di chuyển từ trung tâm TP. Huế:
-            </p>
+            <p className="font-sans font-bold text-foreground text-sm">Điểm gặp & chỗ đậu xe</p>
             <p className="leading-relaxed">{contact.directionsTip}</p>
+            <div className="flex flex-wrap gap-x-4 gap-y-2 pt-2">
+              {contact.meetingPoints.map((point) => (
+                <a
+                  key={point.key}
+                  href={point.mapsHref}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => handleMapsClick(point.key)}
+                  className="font-semibold text-foreground underline decoration-primary/50 underline-offset-4 focus-visible:rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                >
+                  {point.roleLabel}: {point.name}
+                </a>
+              ))}
+            </div>
           </div>
         </ScrollReveal>
       </SiteContainer>

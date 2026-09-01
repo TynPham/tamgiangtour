@@ -4,7 +4,7 @@ const TOUR_DETAIL_PATH = "/vi/trai-nghiem-pha-tam-giang";
 const BOOKING_PATH = "/vi/dat-trai-nghiem";
 
 const validFormData = {
-  date: "2026-08-29",
+  date: "2027-08-29",
   guests: "2",
   name: "Nguyễn Văn An",
   phone: "0332279474",
@@ -82,7 +82,7 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
       page.locator('[data-slot="form-message"]').getByText("Chọn ngày hôm nay hoặc ngày sau."),
     ).toBeVisible();
     await expect(
-      page.locator('[data-slot="form-message"]').getByText("Nhập số lượng khách từ 1 trở lên."),
+      page.locator('[data-slot="form-message"]').getByText("Nhập số lượng khách từ 2 trở lên."),
     ).toBeVisible();
     await expect(
       page.locator('[data-slot="form-message"]').getByText("Nhập họ và tên (tối đa 100 ký tự)."),
@@ -129,7 +129,7 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
 
     expect(capturedPayload).toMatchObject({
       locale: "vi",
-      sourcePage: "booking",
+      sourcePage: "tour_detail",
       requestedTourDate: validFormData.date,
       totalGuestCount: 2,
       guestName: validFormData.name,
@@ -254,6 +254,19 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
     let capturedPayload: unknown = null;
     await page.route("**/api/booking-enquiries", async (route) => {
       capturedPayload = route.request().postDataJSON();
+      const landingPageKey = (capturedPayload as Record<string, unknown>)
+        .landingPageKey;
+      if (!new Set(["home", "tour_detail", "contact"]).has(String(landingPageKey))) {
+        await route.fulfill({
+          status: 422,
+          contentType: "application/json",
+          body: JSON.stringify({
+            outcome: "validation_failed",
+            invalidFields: ["landingPageKey"],
+          }),
+        });
+        return;
+      }
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -261,7 +274,7 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
       });
     });
 
-    await page.goto(`${BOOKING_PATH}?utm_source=google&utm_campaign=summer_sale`);
+    await page.goto("/vi?utm_source=google&utm_campaign=summer_sale");
 
     // Verify consent banner appears
     const banner = page.locator('[role="region"][aria-label="Tùy chọn quyền riêng tư"]');
@@ -271,6 +284,17 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
     const acceptBtn = banner.getByRole("button", { name: "Đồng ý" });
     await acceptBtn.click();
     await expect(banner).not.toBeVisible();
+
+    await page
+      .getByRole("link", { name: "Trải nghiệm", exact: true })
+      .first()
+      .click();
+    await expect(page).toHaveURL(TOUR_DETAIL_PATH);
+    await page
+      .getByRole("link", { name: "Gửi yêu cầu đặt trải nghiệm" })
+      .first()
+      .click();
+    await expect(page).toHaveURL(BOOKING_PATH);
 
     // Submit valid form
     await page.fill('input[name="requestedTourDate"]', validFormData.date);
@@ -283,7 +307,7 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
 
     // Attribution is normalized and contains NO raw UTM parameters
     expect(capturedPayload).toMatchObject({
-      landingPageKey: "booking",
+      landingPageKey: "home",
       acquisitionSource: "google_search",
     });
     expect(capturedPayload).not.toHaveProperty("utm_campaign");
@@ -328,7 +352,9 @@ test.describe("Vietnamese Booking Enquiry Journey", () => {
   }) => {
     await page.goto(BOOKING_PATH);
 
-    const zaloButton = page.getByRole("link", { name: /Chat qua Zalo/i });
+    const zaloButton = page.getByRole("link", {
+      name: "Chat qua Zalo: 0332 279 474",
+    });
     await expect(zaloButton).toBeVisible();
     await expect(zaloButton).toHaveAttribute("target", "_blank");
     await expect(zaloButton).toHaveAttribute("rel", "noopener noreferrer");

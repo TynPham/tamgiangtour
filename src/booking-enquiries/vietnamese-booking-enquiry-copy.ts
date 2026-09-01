@@ -2,10 +2,12 @@ import {
   type BookingEnquiryCopy,
   type BookingEnquiryTourContext,
 } from "./booking-enquiry-section";
+import { V1_PUBLIC_CONTACT, V1_TOUR } from "@/src/content/v1-tour";
+import { V1_TOUR_VI } from "@/src/content/v1-tour-vi";
 
 export const VIETNAMESE_TOUR_CONTEXT: BookingEnquiryTourContext = {
-  key: "trai-nghiem-pha-tam-giang",
-  title: "Trải nghiệm Phá Tam Giang",
+  key: V1_TOUR.key,
+  title: V1_TOUR_VI.name,
   summary:
     "Gửi ngày bạn muốn đi và số lượng khách. Đây là yêu cầu đặt trải nghiệm, chưa phải xác nhận đặt chỗ.",
 };
@@ -23,7 +25,7 @@ export const VIETNAMESE_BOOKING_ENQUIRY_COPY: BookingEnquiryCopy = {
     },
     totalGuestCount: {
       label: "Số lượng khách",
-      error: "Nhập số lượng khách từ 1 trở lên.",
+      error: `Nhập số lượng khách từ ${V1_TOUR.pricing.minimumGuests} trở lên.`,
     },
     guestName: {
       label: "Họ và tên",
@@ -45,23 +47,23 @@ export const VIETNAMESE_BOOKING_ENQUIRY_COPY: BookingEnquiryCopy = {
   storageFailure: {
     heading: "Chưa thể gửi yêu cầu lúc này",
     message:
-      "Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại hoặc gọi 0332 279 474.",
+      `Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại hoặc gọi ${V1_PUBLIC_CONTACT.phoneDisplay}.`,
     retry: "Thử lại",
   },
   ambiguousFailure: {
     heading: "Chưa thể xác minh yêu cầu",
     message:
-      "Chưa thể xác minh yêu cầu đã được ghi nhận. Bạn có thể thử lại an toàn hoặc gọi 0332 279 474.",
+      `Chưa thể xác minh yêu cầu đã được ghi nhận. Bạn có thể thử lại an toàn hoặc gọi ${V1_PUBLIC_CONTACT.phoneDisplay}.`,
     retry: "Thử lại an toàn",
   },
   conflictFailure: {
     heading: "Yêu cầu không thể gửi lại",
-    message: "Vui lòng gọi 0332 279 474 để được hỗ trợ trực tiếp.",
+    message: `Vui lòng gọi ${V1_PUBLIC_CONTACT.phoneDisplay} để được hỗ trợ trực tiếp.`,
   },
   rejectedFailure: {
     heading: "Không thể gửi yêu cầu",
     message:
-      "Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại sau hoặc gọi 0332 279 474.",
+      `Chưa thể gửi yêu cầu lúc này. Vui lòng thử lại sau hoặc gọi ${V1_PUBLIC_CONTACT.phoneDisplay}.`,
   },
   phoneFallback: "Gọi trực tiếp",
   receipt: {
@@ -77,16 +79,13 @@ export const VIETNAMESE_BOOKING_ENQUIRY_COPY: BookingEnquiryCopy = {
 };
 
 export const VIETNAMESE_OPERATOR_PHONE = {
-  display: "0332 279 474",
-  href: "tel:+84332279474",
+  display: V1_PUBLIC_CONTACT.phoneDisplay,
+  href: V1_PUBLIC_CONTACT.phoneHref,
 };
 
 export const VIETNAMESE_ZALO_CONTACT = {
   phone: VIETNAMESE_OPERATOR_PHONE.display,
-  href:
-    process.env.NEXT_PUBLIC_ZALO_URL ||
-    `https://zalo.me/${VIETNAMESE_OPERATOR_PHONE.display.replace(/\s+/g, "")}`,
+  href: V1_PUBLIC_CONTACT.zaloHref,
   label: "Chat qua Zalo",
   ariaLabel: `Chat qua Zalo: ${VIETNAMESE_OPERATOR_PHONE.display}`,
 };
-

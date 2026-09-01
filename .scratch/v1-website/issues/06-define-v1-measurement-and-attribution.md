@@ -95,8 +95,10 @@ Do not join visits using phone numbers, create cross-device identity, add partne
 
 ### Unresolved dependencies
 
-- None. All measurement, attribution, retention, notification, and live event transport requirements are fully specified, implemented, and verified.
+- The 12-month Supabase cleanup migration must be applied and its scheduled job verified in the production project.
+- An authorized PostHog administrator must set and verify the production product-analytics retention period at 90 days. Repository code cannot prove that hosted setting.
 
 ## Comments
 
 - Resolved and verified: canonical V1 measurement contract (8 custom events, non-PII properties, visit-scoped first-touch attribution, 90-day analytics / 12-month enquiry retention, dynamic PostHog client resolution, and strict privacy boundary).
+- Pre-launch implementation adds an auditable Supabase retention job and documents the required hosted PostHog retention check without claiming either production-only check before deployment verification.

@@ -1,9 +1,8 @@
 "use client";
 
 import type { ComponentPropsWithoutRef } from "react";
-import { useEffect } from "react";
 import { analytics } from "@/src/analytics/analytics-client";
-import { hasAnalyticsConsent } from "@/src/analytics/consent";
+import { useConsentedPageView } from "@/src/analytics/use-consented-page-view";
 import type { BookingEnquiryAnalyticsEvent } from "@/src/booking-enquiries/booking-enquiry-contract";
 import { BookingEnquirySection } from "@/src/booking-enquiries/booking-enquiry-section";
 import {
@@ -15,28 +14,7 @@ import { cn } from "@/lib/utils";
 import { buttonVariants } from "@/components/ui/button";
 
 export function BookingPageViewTracker() {
-  useEffect(() => {
-    let tracked = false;
-
-    if (hasAnalyticsConsent()) {
-      analytics.trackPageView("booking", "vi");
-      tracked = true;
-      return;
-    }
-
-    const handleConsentChange = (event: Event) => {
-      const customEvent = event as CustomEvent<{ consent: string }>;
-      if (customEvent.detail?.consent === "granted" && !tracked) {
-        analytics.trackPageView("booking", "vi");
-        tracked = true;
-      }
-    };
-
-    window.addEventListener("tamgiang:consent_changed", handleConsentChange);
-    return () => {
-      window.removeEventListener("tamgiang:consent_changed", handleConsentChange);
-    };
-  }, []);
+  useConsentedPageView("tour_detail");
 
   return null;
 }
@@ -55,7 +33,7 @@ export function BookingContactLink({
   variant?: "default" | "outline" | "secondary" | "ghost" | "link";
 }) {
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    analytics.trackContact(channel, "booking", "vi");
+    analytics.trackContact(channel, "tour_detail", "vi");
     onClick?.(event);
   };
 
@@ -80,7 +58,7 @@ export function BookingEnquiryFormContainer() {
     analytics.trackBookingEnquiryEvent(
       event,
       VIETNAMESE_TOUR_CONTEXT.key,
-      "booking",
+      "tour_detail",
       "vi",
     );
   };

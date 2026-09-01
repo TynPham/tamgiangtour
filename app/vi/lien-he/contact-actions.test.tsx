@@ -8,6 +8,10 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { analytics } from "@/src/analytics/analytics-client";
 import { setAnalyticsConsent } from "@/src/analytics/consent";
+import {
+  PRIMARY_MEETING_POINT,
+  SECONDARY_MEETING_POINT,
+} from "@/src/content/v1-tour";
 import { ContactActionLink, ContactPageViewTracker } from "./contact-actions";
 
 describe("ContactActionLink", () => {
@@ -55,23 +59,38 @@ describe("ContactActionLink", () => {
     const primaryCtaSpy = vi.spyOn(analytics, "trackPrimaryCta");
 
     render(
-      <ContactActionLink
-        kind="maps"
-        href="https://www.google.com/maps/place/verified"
-        meetingPointKey="chu_huyen_boat_pier"
-      >
-        Mở Google Maps
-      </ContactActionLink>,
+      <>
+        {[PRIMARY_MEETING_POINT, SECONDARY_MEETING_POINT].map((point) => (
+          <ContactActionLink
+            key={point.key}
+            kind="maps"
+            href={point.mapsHref}
+            meetingPointKey={point.key}
+          >
+            Mở {point.name}
+          </ContactActionLink>
+        ))}
+      </>,
     );
 
-    const mapsLink = screen.getByRole("link", { name: "Mở Google Maps" });
-    mapsLink.addEventListener("click", (event) => event.preventDefault());
+    const mapsLinks = screen.getAllByRole("link", { name: /Mở Bến đò/i });
+    mapsLinks.forEach((link) => {
+      link.addEventListener("click", (event) => event.preventDefault());
+    });
 
-    await user.click(mapsLink);
+    await user.click(mapsLinks[0]);
+    await user.click(mapsLinks[1]);
 
-    expect(mapsSpy).toHaveBeenCalledOnce();
-    expect(mapsSpy).toHaveBeenCalledWith(
-      "chu_huyen_boat_pier",
+    expect(mapsSpy).toHaveBeenCalledTimes(2);
+    expect(mapsSpy).toHaveBeenNthCalledWith(
+      1,
+      PRIMARY_MEETING_POINT.key,
+      "contact",
+      "vi",
+    );
+    expect(mapsSpy).toHaveBeenNthCalledWith(
+      2,
+      SECONDARY_MEETING_POINT.key,
       "contact",
       "vi",
     );

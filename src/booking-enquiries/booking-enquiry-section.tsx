@@ -24,6 +24,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import {
   BOOKING_ENQUIRY_FIELD_NAMES,
+  BOOKING_ENQUIRY_MINIMUM_GUEST_COUNT,
   EMPTY_BOOKING_ENQUIRY_FORM,
   createBookingEnquiryFormSchema,
   createBookingEnquiryPayload,
@@ -39,7 +40,7 @@ import { submitBookingEnquiry as submitBookingEnquiryRequest } from "./booking-e
 import { useBookingEnquirySubmission } from "./use-booking-enquiry-submission";
 import { analytics } from "@/src/analytics/analytics-client";
 import { hasAnalyticsConsent } from "@/src/analytics/consent";
-import { getVisitAttribution } from "@/src/analytics/attribution";
+import { readFirstTouchAttribution } from "@/src/analytics/attribution";
 
 export type {
   BookingEnquiryAnalyticsEvent,
@@ -305,14 +306,8 @@ export function BookingEnquirySection({
       setShowErrorSummary(false);
 
       const hasConsent = hasAnalyticsConsent();
-      const attribution = getVisitAttribution({
+      const attribution = readFirstTouchAttribution({
         hasConsent,
-        landingPageKey: "booking",
-        referrer: typeof document !== "undefined" ? document.referrer : null,
-        searchParams:
-          typeof window !== "undefined"
-            ? new URLSearchParams(window.location.search)
-            : null,
       });
 
       const normalized = normalizeBookingEnquiryFormValues(values);
@@ -320,7 +315,7 @@ export function BookingEnquirySection({
         normalized,
         attribution
           ? {
-              landingPageKey: attribution.landing_page_key as "home" | "tour_detail" | "contact",
+              landingPageKey: attribution.landing_page_key,
               acquisitionSource: attribution.acquisition_source,
             }
           : undefined,
@@ -403,7 +398,7 @@ export function BookingEnquirySection({
                 <h3 className="text-lg font-bold tracking-tight text-foreground sm:text-xl">
                   {copy.receipt.heading}
                 </h3>
-                <p className="text-xs text-muted-foreground">Phá Tam Giang — Tour Chú Huyền</p>
+                <p className="text-xs text-muted-foreground">{tour.title}</p>
               </div>
             </div>
 
@@ -540,7 +535,7 @@ export function BookingEnquirySection({
                       className="min-h-11 h-11 px-3.5 py-2 text-base md:text-sm rounded-lg border-border/80 bg-background transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1"
                       type="number"
                       inputMode="numeric"
-                      min={1}
+                      min={BOOKING_ENQUIRY_MINIMUM_GUEST_COUNT}
                       step={1}
                       required
                       disabled={fieldLocked}
@@ -656,7 +651,9 @@ export function BookingEnquirySection({
                   >
                     <a
                       href={phone.href}
-                      onClick={() => analytics.trackContact("phone", "booking", "vi")}
+                      onClick={() =>
+                        analytics.trackContact("phone", "tour_detail", "vi")
+                      }
                     >
                       <Phone aria-hidden="true" className="size-3.5 mr-1 text-muted-foreground inline" />
                       {copy.phoneFallback}: {phone.display}

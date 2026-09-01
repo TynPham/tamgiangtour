@@ -30,7 +30,7 @@ describe("BookingPageViewTracker", () => {
     render(<BookingPageViewTracker />);
 
     expect(trackSpy).toHaveBeenCalledTimes(1);
-    expect(trackSpy).toHaveBeenCalledWith("booking", "vi");
+    expect(trackSpy).toHaveBeenCalledWith("tour_detail", "vi");
   });
 
   it("does not emit page_viewed on mount if consent is pending", () => {
@@ -52,7 +52,7 @@ describe("BookingPageViewTracker", () => {
     });
 
     expect(trackSpy).toHaveBeenCalledTimes(1);
-    expect(trackSpy).toHaveBeenCalledWith("booking", "vi");
+    expect(trackSpy).toHaveBeenCalledWith("tour_detail", "vi");
 
     // Firing consent change again does not double-count
     act(() => {
@@ -64,7 +64,7 @@ describe("BookingPageViewTracker", () => {
     expect(trackSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("tracks contact clicks with page_key=booking", async () => {
+  it("tracks booking-page contact clicks within the canonical tour-detail context", async () => {
     const user = userEvent.setup();
     const contactSpy = vi.spyOn(analytics, "trackContact");
 
@@ -79,6 +79,6 @@ describe("BookingPageViewTracker", () => {
     await user.click(link);
 
     expect(contactSpy).toHaveBeenCalledTimes(1);
-    expect(contactSpy).toHaveBeenCalledWith("phone", "booking", "vi");
+    expect(contactSpy).toHaveBeenCalledWith("phone", "tour_detail", "vi");
   });
 });

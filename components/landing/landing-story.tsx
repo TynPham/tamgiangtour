@@ -1,5 +1,4 @@
 import Image from "next/image";
-import { Quote } from "lucide-react";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
 import { ScrollReveal } from "@/components/landing/scroll-reveal";
 
@@ -28,10 +27,10 @@ export function LandingStory() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent pointer-events-none" />
                 <div className="absolute bottom-5 left-5 right-5 text-white">
                   <p className="font-sans font-bold text-base sm:text-lg drop-shadow-md">
-                    Chú Huyền — Người điều hành bản địa
+                    Phá Tam Giang
                   </p>
                   <p className="text-xs text-white/80 drop-shadow-sm font-sans mt-0.5">
-                    Gia đình ngư dân làng chài Phá Tam Giang
+                    Không gian gia đình làm việc và đón khách
                   </p>
                 </div>
               </div>
@@ -49,10 +48,7 @@ export function LandingStory() {
                 id="story-heading"
                 className="max-w-[17ch] text-balance font-sans text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-4xl lg:text-5xl"
               >
-                Gia đình làng chài{" "}
-                <span className="block sm:inline">
-                  gắn bó cùng con nước Tam Giang
-                </span>
+                {familyStory.heading}
               </h2>
               <p className="text-base sm:text-lg text-foreground/80 leading-relaxed text-balance font-medium">
                 {familyStory.subheading}
@@ -65,16 +61,6 @@ export function LandingStory() {
               ))}
             </ScrollReveal>
 
-            {/* Editorial Pull Quote (Restrained Warm Italic Serif Accent) */}
-            <ScrollReveal delay={220} direction="left" distance={18} duration={760} className="relative border-t border-border/80 pt-6">
-              <Quote className="size-6 text-primary/25 mb-2" aria-hidden="true" />
-              <blockquote className="font-serif text-lg sm:text-xl font-normal italic text-foreground leading-relaxed text-balance">
-                &ldquo;{familyStory.quote}&rdquo;
-              </blockquote>
-              <p className="mt-3 text-xs font-semibold text-primary uppercase tracking-wider">
-                — {familyStory.quoteAuthor}
-              </p>
-            </ScrollReveal>
           </div>
         </div>
       </div>

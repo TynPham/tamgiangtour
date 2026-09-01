@@ -24,8 +24,7 @@ export function LandingItinerary() {
                 id="itinerary-heading"
                 className="max-w-[14ch] text-balance font-sans text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-4xl lg:text-5xl"
               >
-                Lịch trình trải nghiệm{" "}
-                <span className="block sm:inline">chi tiết</span>
+                {itinerary.heading}
               </h2>
               <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
                 {itinerary.subheading}

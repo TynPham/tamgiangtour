@@ -21,15 +21,21 @@ const lora = Lora({
 import { AnalyticsConsentBanner } from "@/components/analytics-consent-banner";
 import { FloatingZaloButton } from "@/components/floating-zalo-button";
 import { PostHogProvider } from "@/src/analytics/posthog-provider";
+import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
+import { SITE_URL } from "@/src/seo/site-metadata";
+
+const googleSiteVerification = process.env.GOOGLE_SITE_VERIFICATION;
 
 export const metadata: Metadata = {
   title: {
     template: "%s | Tour Phá Tam Giang - Chú Huyền",
     default: "Tour Du Lịch Phá Tam Giang - Chú Huyền | Trải Nghiệm Bản Địa Xứ Huế",
   },
-  description:
-    "Trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân bản địa. Đón hoàng hôn, chèo SUP, thả lưới cá và thưởng thức tiệc BBQ hải sản đầm phá tươi ngon.",
-  metadataBase: new URL("https://tamgiangtour.vn"),
+  description: LANDING_PAGE_CONTENT.metadata.description,
+  metadataBase: new URL(SITE_URL),
+  verification: googleSiteVerification
+    ? { google: googleSiteVerification }
+    : undefined,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

@@ -104,8 +104,7 @@ export function SiteFooter({ pageKey }: SiteFooterProps) {
 
         <div className="mt-14 flex flex-col items-center justify-between gap-4 border-t border-white/15 pt-8 text-center text-xs text-white/50 sm:flex-row sm:text-left">
           <p>
-            © {footer.copyrightYear} {footer.brandName}. Trải nghiệm du lịch đầm
-            phá bản địa chân thật.
+            © {footer.copyrightYear} {footer.brandName}. Trải nghiệm cùng gia đình địa phương trên đầm phá.
           </p>
           <p className="text-white/45">
             Phá Tam Giang, Thừa Thiên Huế, Việt Nam

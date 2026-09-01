@@ -13,30 +13,16 @@ import { LandingFaq } from "@/components/landing/landing-faq";
 import { LandingContact } from "@/components/landing/landing-contact";
 import { LandingFooter } from "@/components/landing/landing-footer";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
+import { createVietnamesePageMetadata } from "@/src/seo/site-metadata";
 
 export const metadata: Metadata = {
-  title: LANDING_PAGE_CONTENT.metadata.title,
-  description: LANDING_PAGE_CONTENT.metadata.description,
-  keywords: LANDING_PAGE_CONTENT.metadata.keywords,
-  alternates: {
-    canonical: "/vi",
-  },
-  openGraph: {
+  ...createVietnamesePageMetadata({
+    path: "/vi",
     title: LANDING_PAGE_CONTENT.metadata.title,
     description: LANDING_PAGE_CONTENT.metadata.description,
-    url: LANDING_PAGE_CONTENT.metadata.canonicalUrl,
-    siteName: LANDING_PAGE_CONTENT.navigation.brandName,
-    locale: "vi_VN",
-    type: "website",
-    images: [
-      {
-        url: LANDING_PAGE_CONTENT.metadata.ogImage,
-        width: 1200,
-        height: 630,
-        alt: LANDING_PAGE_CONTENT.hero.heroImageAlt,
-      },
-    ],
-  },
+    imageAlt: LANDING_PAGE_CONTENT.hero.heroImageAlt,
+  }),
+  keywords: [...LANDING_PAGE_CONTENT.metadata.keywords],
 };
 
 export default function VietnameseLandingPage() {

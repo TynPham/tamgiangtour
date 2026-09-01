@@ -16,15 +16,10 @@ export type AnalyticsSink = (
   properties: Record<string, unknown>,
 ) => void;
 
-import posthog from "posthog-js";
+import { capturePostHogEvent } from "./posthog-runtime";
 
 function getPostHogSink(): AnalyticsSink | null {
-  if (typeof window !== "undefined" && typeof posthog?.capture === "function") {
-    return (eventName, properties) => {
-      posthog.capture(eventName, properties);
-    };
-  }
-  return null;
+  return typeof window === "undefined" ? null : capturePostHogEvent;
 }
 
 export interface AnalyticsTracker {

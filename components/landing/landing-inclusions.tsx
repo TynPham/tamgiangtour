@@ -1,4 +1,4 @@
-import { Check, X, Info } from "lucide-react";
+import { Check, Info } from "lucide-react";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
 import { ScrollReveal } from "@/components/landing/scroll-reveal";
 
@@ -26,7 +26,7 @@ export function LandingInclusions() {
             <span className="block sm:inline">Thông tin cần biết</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl">
-            Minh bạch chi tiết để bạn và gia đình chuẩn bị chuyến đi trọn vẹn nhất
+            Các dịch vụ và lưu ý đã được xác nhận để khách chuẩn bị trước chuyến đi
           </p>
         </ScrollReveal>
 
@@ -62,40 +62,13 @@ export function LandingInclusions() {
             </div>
           </ScrollReveal>
 
-          {/* Column 2: Not Included & Practical Notes */}
+          {/* Column 2: Practical Notes */}
           <ScrollReveal delay={120} direction="up" distance={14} className="lg:col-span-5 space-y-10">
-            {/* Not Included */}
-            <div className="space-y-4">
-              <div className="pb-3 border-b border-border">
-                <span className="font-sans text-xl sm:text-2xl font-bold text-foreground">
-                  Không bao gồm
-                </span>
-              </div>
-
-              <div className="space-y-4">
-                {inclusions.notIncluded.map((item, index) => (
-                  <div key={index} className="flex items-start gap-3">
-                    <div className="flex size-5 shrink-0 items-center justify-center rounded-full bg-muted text-muted-foreground mt-0.5">
-                      <X className="size-3.5 stroke-[2.5]" aria-hidden="true" />
-                    </div>
-                    <div className="space-y-0.5">
-                      <h4 className="font-sans text-xs sm:text-sm font-semibold text-foreground">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-muted-foreground leading-relaxed">
-                        {item.description}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
             {/* Practical Preparation Notes */}
             <div className="space-y-3.5 border-l-2 border-primary bg-muted/35 px-5 py-5 sm:px-6">
               <div className="flex items-center gap-2 text-foreground font-sans text-lg font-bold">
                 <Info className="size-4 text-primary" aria-hidden="true" />
-                <span>Lưu ý chuẩn bị</span>
+                <span>Thông tin cần biết</span>
               </div>
 
               <ul className="space-y-2.5 text-xs sm:text-sm text-muted-foreground">

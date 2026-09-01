@@ -53,7 +53,7 @@ export function LandingGallery() {
                 alt={photo.alt}
                 fill
                 sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                className="object-cover transition-transform duration-700 ease-out group-hover:scale-104"
+                className={`${photo.imagePosition === "bottom" ? "object-bottom" : "object-center"} object-cover transition-transform duration-700 ease-out group-hover:scale-104`}
               />
               <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/5 to-transparent transition-opacity duration-300" />
 

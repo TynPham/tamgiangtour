@@ -4,12 +4,14 @@ import Link from "next/link";
 import {
   ArrowRight,
   CheckCircle2,
+  MessageCircle,
   Navigation,
   Phone,
   ShieldCheck,
 } from "lucide-react";
 
 import { ScrollReveal } from "@/components/landing/scroll-reveal";
+import { LandingFaq } from "@/components/landing/landing-faq";
 import { WaterDivider } from "@/components/landing/water-primitives";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
@@ -23,33 +25,32 @@ import {
   VIETNAMESE_TOUR_CONTEXT,
 } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
 import { LANDING_PAGE_CONTENT } from "@/src/content/landing-page-content";
+import { createVietnamesePageMetadata } from "@/src/seo/site-metadata";
 import {
   TourDetailContactLink,
   TourDetailPageViewTracker,
   TourDetailPrimaryCta,
 } from "./tour-detail-client";
 
-export const metadata: Metadata = {
-  title: "Trải nghiệm Phá Tam Giang",
-  description:
-    "Trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân địa phương. Đón hoàng hôn trên phá, chèo SUP, thả lưới cá và thưởng thức BBQ hải sản.",
-  alternates: {
-    canonical: "/vi/trai-nghiem-pha-tam-giang",
-  },
-  openGraph: {
-    title: "Trải nghiệm Phá Tam Giang | Tour Du Lịch Chú Huyền",
-    description:
-      "Trải nghiệm đầm phá Tam Giang cùng gia đình ngư dân địa phương. Đón hoàng hôn trên phá, chèo SUP, thả lưới cá và thưởng thức BBQ hải sản.",
-    url: "https://tamgiangtour.vn/vi/trai-nghiem-pha-tam-giang",
-    siteName: LANDING_PAGE_CONTENT.navigation.brandName,
-    locale: "vi_VN",
-    type: "website",
-  },
-};
+export const metadata: Metadata = createVietnamesePageMetadata({
+  path: "/vi/trai-nghiem-pha-tam-giang",
+  title: LANDING_PAGE_CONTENT.tour.name,
+  description: LANDING_PAGE_CONTENT.metadata.description,
+  imageAlt: LANDING_PAGE_CONTENT.hero.heroImageAlt,
+});
 
 export default function VietnameseTourDetailPage() {
-  const { contact, quickFacts, highlights, itinerary, inclusions } =
-    LANDING_PAGE_CONTENT;
+  const {
+    contact,
+    familyStory,
+    highlights,
+    inclusions,
+    itinerary,
+    policies,
+    pricing,
+    quickFacts,
+    tour,
+  } = LANDING_PAGE_CONTENT;
 
   return (
     <div className="tam-giang-site flex min-h-screen flex-col overflow-x-clip bg-background text-foreground selection:bg-primary/20 selection:text-foreground">
@@ -83,15 +84,12 @@ export default function VietnameseTourDetailPage() {
                 className="space-y-6 lg:col-span-7"
               >
                 <div className="space-y-4">
-                  <SectionEyebrow>Trải nghiệm bản địa chân thật</SectionEyebrow>
+                  <SectionEyebrow>Trải nghiệm cùng gia đình địa phương</SectionEyebrow>
                   <h1 className="text-balance font-sans text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-4xl lg:text-5xl">
                     {VIETNAMESE_TOUR_CONTEXT.title}
                   </h1>
                   <p className="max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                    Cùng gia đình ngư dân xuôi thuyền gỗ lướt trên mặt nước mênh
-                    mông, chèo SUP giữa ráng chiều đỏ rực, tự tay thả lưới cất rớ
-                    và thưởng thức bữa tiệc BBQ hải sản đầm phá nóng hổi ngay tại
-                    chòi.
+                    {tour.summary}
                   </p>
                 </div>
 
@@ -125,7 +123,7 @@ export default function VietnameseTourDetailPage() {
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-border/80 bg-card shadow-lg">
                     <Image
                       src="/images/tamgiang/hero-sunset.jpg"
-                      alt="Hoàng hôn buông xuống trên đầm phá Tam Giang với thuyền gỗ truyền thống"
+                      alt="Mặt nước Phá Tam Giang trong ánh chiều"
                       fill
                       sizes="(max-width: 1024px) 100vw, 40vw"
                       className="object-cover transition-transform duration-700 hover:scale-105"
@@ -135,14 +133,14 @@ export default function VietnameseTourDetailPage() {
                     <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between text-white">
                       <div className="space-y-0.5">
                         <span className="text-[0.68rem] font-semibold uppercase tracking-[0.16em] text-[var(--lagoon-sun)]">
-                          Hoàng hôn xứ Huế
+                          Phá Tam Giang
                         </span>
                         <p className="font-sans text-sm font-medium">
-                          Bến thuyền Chú Huyền — Phá Tam Giang
+                          Trải nghiệm cùng gia đình Chú Huyền
                         </p>
                       </div>
                       <Badge className="bg-primary/90 text-primary-foreground text-xs font-semibold">
-                        Gia đình bản địa
+                        Gia đình vận hành
                       </Badge>
                     </div>
                   </div>
@@ -190,6 +188,10 @@ export default function VietnameseTourDetailPage() {
                 </ScrollReveal>
               ))}
             </div>
+            <div className="mt-7 grid gap-3 border-t border-border/70 pt-5 text-sm text-muted-foreground sm:grid-cols-2">
+              <p><span className="font-semibold text-foreground">Hình thức:</span> {tour.format}.</p>
+              <p><span className="font-semibold text-foreground">Quy mô:</span> {tour.groupSize}.</p>
+            </div>
           </SiteContainer>
         </section>
 
@@ -233,7 +235,7 @@ export default function VietnameseTourDetailPage() {
                       alt={item.imageAlt}
                       fill
                       sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 hover:scale-105"
+                      className={`${item.imagePosition === "bottom" ? "object-bottom" : "object-center"} object-cover transition-transform duration-500 hover:scale-105`}
                     />
                     {item.badgeText && (
                       <Badge className="absolute left-3 top-3 bg-black/60 text-white backdrop-blur-xs text-[0.68rem]">
@@ -318,8 +320,8 @@ export default function VietnameseTourDetailPage() {
                 Dịch vụ bao gồm & Thông tin cần biết
               </h2>
               <p className="text-sm leading-relaxed text-muted-foreground sm:text-base">
-                Chi tiết các dịch vụ được gia đình chuẩn bị chu đáo và những lưu
-                ý thực tế trước khi lên thuyền.
+                Các dịch vụ đã được xác nhận và những lưu ý thực tế trước khi
+                lên thuyền.
               </p>
             </ScrollReveal>
 
@@ -354,7 +356,7 @@ export default function VietnameseTourDetailPage() {
                 </div>
               </ScrollReveal>
 
-              {/* Not included & practical notes */}
+              {/* Pricing, policies & practical notes */}
               <ScrollReveal
                 direction="left"
                 distance={20}
@@ -365,22 +367,31 @@ export default function VietnameseTourDetailPage() {
                     <span className="flex size-5 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
                       !
                     </span>
-                    <span>Không bao gồm & Chi phí ngoài</span>
+                    <span>Giá & chính sách thực tế</span>
                   </div>
                   <div className="space-y-2.5">
-                    {inclusions.notIncluded.map((item) => (
+                    {pricing.options.map((option) => (
                       <div
-                        key={item.title}
+                        key={option.key}
                         className="rounded-lg border border-border/50 bg-muted/20 p-3 space-y-0.5"
                       >
                         <p className="text-xs font-medium text-foreground sm:text-sm">
-                          {item.title}
+                          {option.label}: {option.display}
                         </p>
                         <p className="text-xs leading-relaxed text-muted-foreground">
-                          {item.description}
+                          {option.description}
                         </p>
                       </div>
                     ))}
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      Tối thiểu {pricing.minimumGuests} khách. {policies.deposit}
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {policies.changeOrCancel} {policies.lateCancellation} {policies.noShow}
+                    </p>
+                    <p className="text-xs leading-relaxed text-muted-foreground">
+                      {policies.weather}
+                    </p>
                   </div>
                 </div>
 
@@ -405,7 +416,41 @@ export default function VietnameseTourDetailPage() {
           </SiteContainer>
         </section>
 
-        {/* SECTION 5: Location & Maps Teaser */}
+        {/* SECTION 5: Family context */}
+        <section
+          aria-labelledby="family-context-heading"
+          className="border-t border-border/60 py-16 sm:py-20"
+        >
+          <SiteContainer>
+            <ScrollReveal
+              direction="up"
+              distance={20}
+              className="grid gap-8 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:items-start"
+            >
+              <div className="space-y-3">
+                <SectionEyebrow>{familyStory.badge}</SectionEyebrow>
+                <h2
+                  id="family-context-heading"
+                  className="text-balance font-sans text-2xl font-semibold tracking-[-0.03em] text-foreground sm:text-3xl"
+                >
+                  {familyStory.heading}
+                </h2>
+                <p className="text-sm leading-relaxed text-foreground/80 sm:text-base">
+                  {familyStory.subheading}
+                </p>
+              </div>
+              <div className="space-y-4 text-sm leading-relaxed text-muted-foreground sm:text-base">
+                {familyStory.paragraphs.map((paragraph) => (
+                  <p key={paragraph}>{paragraph}</p>
+                ))}
+              </div>
+            </ScrollReveal>
+          </SiteContainer>
+        </section>
+
+        <LandingFaq />
+
+        {/* SECTION 6: Location & Maps Teaser */}
         <section
           aria-labelledby="location-teaser-heading"
           className="border-t border-border/60 py-16 sm:py-20"
@@ -414,38 +459,41 @@ export default function VietnameseTourDetailPage() {
             <div className="rounded-2xl border border-border/80 bg-muted/30 p-6 sm:p-10">
               <div className="grid grid-cols-1 items-center gap-8 lg:grid-cols-12">
                 <div className="space-y-3 lg:col-span-7">
-                  <SectionEyebrow>Điểm đón & Chỉ đường</SectionEyebrow>
+                  <SectionEyebrow>Điểm gặp & Chỉ đường</SectionEyebrow>
                   <h2
                     id="location-teaser-heading"
                     className="font-sans text-2xl font-bold tracking-tight text-foreground sm:text-3xl"
                   >
-                    Điểm đón bến thuyền Chú Huyền
+                    Hai điểm gặp được gia đình xác nhận
                   </h2>
                   <p className="max-w-xl text-sm leading-relaxed text-muted-foreground">
-                    Bến thuyền có vị trí xác thực trên Google Maps, cách trung
-                    tâm TP. Huế khoảng 15–20km (mất 30–40 phút di chuyển theo
-                    Quốc lộ 49B).
+                    {contact.description} Khách tự di chuyển đến điểm đã thống nhất; cả hai nơi có chỗ đậu xe máy và ô tô.
                   </p>
-                  <div className="border-l-2 border-primary pl-4 pt-1">
-                    <p className="text-sm font-semibold text-foreground">
-                      {contact.mapsPlaceName}
-                    </p>
-                    <p className="mt-0.5 text-xs text-muted-foreground">
-                      {contact.mapsAddress}
-                    </p>
+                  <div className="space-y-2 border-l-2 border-primary pl-4 pt-1">
+                    {contact.meetingPoints.map((point) => (
+                      <div key={point.key}>
+                        <p className="text-sm font-semibold text-foreground">
+                          {point.roleLabel}: {point.name}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">{point.parkingText}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-3 sm:flex-row lg:col-span-5 lg:justify-end">
-                  <TourDetailContactLink
-                    kind="maps"
-                    href={contact.mapsHref}
-                    meetingPointKey={contact.mapsPlaceKey}
-                    className="min-h-12 px-5 text-sm font-semibold"
-                  >
-                    <Navigation className="mr-2 size-4" aria-hidden="true" />
-                    <span>Mở Google Maps</span>
-                  </TourDetailContactLink>
+                  {contact.meetingPoints.map((point) => (
+                    <TourDetailContactLink
+                      key={point.key}
+                      kind="maps"
+                      href={point.mapsHref}
+                      meetingPointKey={point.key}
+                      className="min-h-12 px-5 text-sm font-semibold"
+                    >
+                      <Navigation className="mr-2 size-4" aria-hidden="true" />
+                      <span>{point.role === "primary" ? "Mở điểm chính" : "Mở điểm thay thế"}</span>
+                    </TourDetailContactLink>
+                  ))}
 
                   <Button
                     asChild
@@ -464,7 +512,7 @@ export default function VietnameseTourDetailPage() {
           </SiteContainer>
         </section>
 
-        {/* SECTION 6: Closing Booking CTA Banner Section */}
+        {/* SECTION 7: Closing Booking CTA Banner Section */}
         <section
           aria-labelledby="tour-detail-cta-heading"
           className="relative overflow-hidden border-t border-border/60 bg-muted/20 py-20 sm:py-28"
@@ -481,7 +529,7 @@ export default function VietnameseTourDetailPage() {
               className="mx-auto max-w-3xl text-center space-y-6"
             >
               <SectionEyebrow className="justify-center">
-                Đặt chỗ trực tiếp
+                Gửi yêu cầu
               </SectionEyebrow>
               <h2
                 id="tour-detail-cta-heading"
@@ -490,7 +538,7 @@ export default function VietnameseTourDetailPage() {
                 Sẵn sàng cho chuyến du ngoạn Phá Tam Giang?
               </h2>
               <p className="mx-auto max-w-xl text-base leading-relaxed text-muted-foreground sm:text-lg">
-                Điền ngày bạn dự kiến đi và số lượng khách. Gia đình Chú Huyền sẽ sắp xếp thuyền chu đáo và liên hệ xác nhận trực tiếp cùng bạn.
+                Điền ngày dự kiến và số lượng khách. Gia đình Chú Huyền sẽ liên hệ để thống nhất chuyến đi; gửi biểu mẫu chưa phải là xác nhận đặt chỗ.
               </p>
 
               <div className="flex flex-col items-center justify-center gap-3.5 pt-2 sm:flex-row">
@@ -504,12 +552,21 @@ export default function VietnameseTourDetailPage() {
                   <Phone className="mr-2 size-4 text-primary" aria-hidden="true" />
                   <span>Gọi tư vấn: {contact.phoneDisplay}</span>
                 </TourDetailContactLink>
+                <TourDetailContactLink
+                  kind="zalo"
+                  href={contact.zaloHref}
+                  variant="outline"
+                  className="min-h-12 border-border px-5 text-sm font-semibold sm:text-base"
+                >
+                  <MessageCircle className="mr-2 size-4 text-primary" aria-hidden="true" />
+                  <span>{contact.zaloLabel}</span>
+                </TourDetailContactLink>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 pt-4 text-xs text-muted-foreground">
                 <span className="flex items-center gap-1.5">
                   <ShieldCheck className="size-4 text-primary" aria-hidden="true" />
-                  Không cần thanh toán trước
+                  {policies.deposit}
                 </span>
                 <span className="flex items-center gap-1.5">
                   <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" aria-hidden="true" />

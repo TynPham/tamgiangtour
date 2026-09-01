@@ -31,14 +31,14 @@ export function LandingTrust() {
         <ScrollReveal delay={0} direction="right" distance={28} variant="heading" className="mb-14 max-w-3xl space-y-4 text-left sm:mb-20">
           <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-primary">
             <span className="h-px w-6 bg-primary" aria-hidden="true" />
-            <span>Cam kết an tâm</span>
+            <span>Thông tin trước chuyến đi</span>
           </div>
           <h2
             id="trust-heading"
             className="max-w-[15ch] text-balance font-sans text-3xl font-semibold leading-[1.08] tracking-[-0.035em] text-foreground sm:text-4xl lg:text-5xl"
           >
-            An tâm trọn vẹn{" "}
-            <span className="block sm:inline">khi trải nghiệm</span>
+            Thông tin rõ ràng{" "}
+            <span className="block sm:inline">trước khi trải nghiệm</span>
           </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-xl">
             {trust.subheading}
@@ -81,7 +81,7 @@ export function LandingTrust() {
         <ScrollReveal delay={160} direction="left" distance={24} className="flex flex-col items-start justify-between gap-6 border-y border-primary/35 py-7 sm:flex-row sm:items-center">
           <div className="space-y-1.5 text-left">
             <h3 className="font-sans text-lg sm:text-xl font-bold text-foreground">
-              Vị trí điểm đón xác thực trên Google Maps
+              Vị trí điểm gặp chính trên Google Maps
             </h3>
             <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
               {trust.mapsNote}

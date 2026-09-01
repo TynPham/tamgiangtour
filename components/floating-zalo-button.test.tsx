@@ -5,11 +5,19 @@ import "@testing-library/jest-dom/vitest";
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
+const route = vi.hoisted(() => ({ pathname: "/vi" }));
+vi.mock("next/navigation", () => ({
+  usePathname: () => route.pathname,
+}));
+
 import { FloatingZaloButton, ZaloIcon } from "./floating-zalo-button";
 import { VIETNAMESE_ZALO_CONTACT } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
+import { analytics } from "@/src/analytics/analytics-client";
 
 afterEach(() => {
   cleanup();
+  route.pathname = "/vi";
+  vi.restoreAllMocks();
 });
 
 describe("FloatingZaloButton", () => {
@@ -53,6 +61,20 @@ describe("FloatingZaloButton", () => {
       channel: "zalo",
       href: VIETNAMESE_ZALO_CONTACT.href,
     });
+  });
+
+  it("tracks Zalo with the canonical context of the current public route", () => {
+    const trackContact = vi.spyOn(analytics, "trackContact");
+    route.pathname = "/vi/lien-he";
+    render(<FloatingZaloButton />);
+
+    fireEvent.click(
+      screen.getByRole("link", {
+        name: new RegExp(VIETNAMESE_ZALO_CONTACT.phone, "i"),
+      }),
+    );
+
+    expect(trackContact).toHaveBeenCalledWith("zalo", "contact", "vi");
   });
 
   it("accepts custom destination href and aria-label", () => {

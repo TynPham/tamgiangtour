@@ -10,6 +10,8 @@ import {
   BookingEnquirySection,
   type BookingEnquiryCopy,
 } from "./booking-enquiry-section";
+import { captureFirstTouchAttribution } from "@/src/analytics/attribution";
+import { setAnalyticsConsent } from "@/src/analytics/consent";
 
 const copy: BookingEnquiryCopy = {
   heading: "Send an enquiry",
@@ -23,7 +25,7 @@ const copy: BookingEnquiryCopy = {
     },
     totalGuestCount: {
       label: "Total guest count",
-      error: "Enter at least one guest.",
+      error: "Enter at least two guests.",
     },
     guestName: {
       label: "Guest name",
@@ -81,6 +83,8 @@ const validValues = {
 
 afterEach(() => {
   cleanup();
+  window.localStorage.clear();
+  window.sessionStorage.clear();
   window.history.replaceState(null, "", "/");
 });
 
@@ -176,6 +180,45 @@ describe("Booking enquiry section", () => {
     expect(submitEnquiry).not.toHaveBeenCalled();
   });
 
+  it("rejects one guest in the client while accepting the minimum of two", async () => {
+    const submitEnquiry = vi
+      .fn()
+      .mockResolvedValue({ outcome: "recorded", replayed: false });
+    renderSection({ submitEnquiry });
+    const guestCount = screen.getByLabelText(copy.fields.totalGuestCount.label);
+
+    expect(guestCount).toHaveAttribute("min", "2");
+    fireEvent.change(
+      screen.getByLabelText(copy.fields.requestedTourDate.label),
+      { target: { value: validValues.requestedTourDate } },
+    );
+    await userEvent.type(guestCount, "1");
+    await userEvent.type(
+      screen.getByLabelText(copy.fields.guestName.label),
+      validValues.guestName,
+    );
+    await userEvent.type(
+      screen.getByLabelText(copy.fields.phoneNumber.label),
+      validValues.phoneNumber,
+    );
+    await userEvent.click(screen.getByRole("button", { name: copy.submit }));
+
+    const summary = await screen.findByRole("alert");
+    await waitFor(() => expect(summary).toHaveFocus());
+    expect(screen.getAllByText(copy.fields.totalGuestCount.error)).toHaveLength(2);
+    expect(submitEnquiry).not.toHaveBeenCalled();
+
+    await userEvent.clear(guestCount);
+    await userEvent.type(guestCount, "2");
+    await userEvent.click(screen.getByRole("button", { name: copy.submit }));
+
+    await waitFor(() => expect(submitEnquiry).toHaveBeenCalledTimes(1));
+    expect(submitEnquiry).toHaveBeenCalledWith(
+      expect.objectContaining({ totalGuestCount: 2 }),
+      "opaque-key-123456",
+    );
+  });
+
   it("removes the error summary after every invalid field is corrected", async () => {
     const submitEnquiry = vi.fn();
     renderSection({ submitEnquiry });
@@ -246,6 +289,33 @@ describe("Booking enquiry section", () => {
         sourcePage: "tour_detail",
         totalGuestCount: 2,
         phoneNumber: "0332279474",
+      }),
+      "opaque-key-123456",
+    );
+  });
+
+  it("submits the stored canonical first-touch attribution", async () => {
+    setAnalyticsConsent("granted");
+    captureFirstTouchAttribution({
+      hasConsent: true,
+      landingPageKey: "home",
+      referrer: "https://www.google.com/search?q=tam+giang",
+      currentOrigin: "https://tamgiangtour.vn",
+      storage: window.sessionStorage,
+    });
+    const submitEnquiry = vi
+      .fn()
+      .mockResolvedValue({ outcome: "recorded", replayed: false });
+    renderSection({ submitEnquiry });
+
+    await fillValidForm();
+    await userEvent.click(screen.getByRole("button", { name: copy.submit }));
+
+    await waitFor(() => expect(submitEnquiry).toHaveBeenCalledTimes(1));
+    expect(submitEnquiry).toHaveBeenCalledWith(
+      expect.objectContaining({
+        landingPageKey: "home",
+        acquisitionSource: "google_search",
       }),
       "opaque-key-123456",
     );

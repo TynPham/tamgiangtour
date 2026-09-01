@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "notifications:retry:telegram": "tsc -p tsconfig.scripts.json && node --env-file-if-exists=.env.local .scripts-dist/scripts/retry-telegram-notification.js",
     "test": "vitest run",
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit"

@@ -17,7 +17,7 @@ afterEach(() => {
 
 describe("Vietnamese Booking Enquiry Page (/vi/dat-trai-nghiem)", () => {
   it("renders intro, compact tour context, phone/Zalo fallback, and mounted enquiry form", () => {
-    const { contact } = LANDING_PAGE_CONTENT;
+    const { contact, pricing, tour } = LANDING_PAGE_CONTENT;
     render(<VietnameseBookingEnquiryPage />);
     const main = within(screen.getByRole("main"));
 
@@ -31,8 +31,12 @@ describe("Vietnamese Booking Enquiry Page (/vi/dat-trai-nghiem)", () => {
     // 2. Compact tour context text
     expect(main.getAllByText("Trải nghiệm Phá Tam Giang").length).toBeGreaterThanOrEqual(1);
     expect(
-      main.getByText(/Khoảng 3.5 – 4 giờ · Bắt đầu khoảng 15:40 chiều/i),
+      main.getByText(new RegExp(`Khoảng ${tour.duration}`)),
     ).toBeInTheDocument();
+    expect(
+      main.getByText(new RegExp(pricing.options[0].display)),
+    ).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(/3\.5|15:40 chiều/i);
 
     // 3. Phone and Zalo contact options
     expect(
@@ -54,11 +58,10 @@ describe("Vietnamese Booking Enquiry Page (/vi/dat-trai-nghiem)", () => {
         name: VIETNAMESE_BOOKING_ENQUIRY_COPY.heading,
       }),
     ).toBeInTheDocument();
+    expect(document.body).not.toHaveTextContent(/tư vấn gấp/i);
 
     // 5. Canonical metadata
-    expect(metadata.title).toBe(
-      "Gửi yêu cầu đặt trải nghiệm | Tour Phá Tam Giang - Chú Huyền",
-    );
+    expect(metadata.title).toBe("Gửi yêu cầu đặt trải nghiệm");
     expect(metadata.alternates?.canonical).toBe("/vi/dat-trai-nghiem");
   });
 });

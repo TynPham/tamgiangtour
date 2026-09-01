@@ -1,6 +1,6 @@
 import type { BookingEnquiryFieldName } from "@/src/booking-enquiries/booking-enquiry-contract";
 
-export type PageKey = "home" | "tour_detail" | "contact" | "booking";
+export type PageKey = "home" | "tour_detail" | "contact";
 export type Locale = "vi" | "en";
 export type ContactChannel = "phone" | "zalo";
 export type FailureCategory = "storage" | "network_or_unknown";

@@ -42,7 +42,7 @@ export function LandingHighlights() {
                   alt={leadItem.imageAlt}
                   fill
                   sizes="(max-width: 1024px) 100vw, 85vw"
-                  className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                  className={`${leadItem.imagePosition === "bottom" ? "object-bottom" : "object-center"} object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent lg:hidden" />
                 <div className="absolute bottom-5 left-5 right-5 text-white lg:hidden space-y-1.5">
@@ -84,7 +84,7 @@ export function LandingHighlights() {
                     alt={itemTwo.imageAlt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 45vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                    className={`${itemTwo.imagePosition === "bottom" ? "object-bottom" : "object-center"} object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
                   />
                 </div>
                 <div className="space-y-2 max-w-lg">
@@ -110,7 +110,7 @@ export function LandingHighlights() {
                     alt={itemThree.imageAlt}
                     fill
                     sizes="(max-width: 1024px) 100vw, 45vw"
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-103"
+                    className={`${itemThree.imagePosition === "bottom" ? "object-bottom" : "object-center"} object-cover transition-transform duration-700 ease-out group-hover:scale-103`}
                   />
                 </div>
                 <div className="space-y-2 max-w-lg">

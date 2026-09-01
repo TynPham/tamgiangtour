@@ -1,7 +1,9 @@
 "use client";
 
 import * as React from "react";
+import { usePathname } from "next/navigation";
 import { cn } from "@/lib/utils";
+import { canonicalPageKeyForPathname } from "@/src/analytics/page-context";
 import { VIETNAMESE_ZALO_CONTACT } from "@/src/booking-enquiries/vietnamese-booking-enquiry-copy";
 
 export interface ContactClickedPayload {
@@ -80,6 +82,7 @@ export function FloatingZaloButton({
   onClick,
   ...props
 }: FloatingZaloButtonProps) {
+  const pathname = usePathname();
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (onContactClick) {
       onContactClick({
@@ -87,7 +90,8 @@ export function FloatingZaloButton({
         href,
       });
     }
-    analytics.trackContact("zalo", "tour_detail", "vi");
+    const pageKey = canonicalPageKeyForPathname(pathname);
+    if (pageKey) analytics.trackContact("zalo", pageKey, "vi");
     onClick?.(event);
   };
 
