@@ -1,6 +1,63 @@
-# Tam Giang Tour — V1
+# Tam Giang Tour: V1
 
 Vietnamese-first Next.js website for the family-operated Tam Giang Lagoon experience. V1 helps a visitor evaluate the tour, contact the family, and submit a durable `Booking enquiry`. An enquiry is not a confirmed booking: the family reviews it and confirms the trip manually.
+
+Production: [tamgiangtour-ten.vercel.app](https://tamgiangtour-ten.vercel.app)
+
+## Public routes
+
+The Vietnamese V1 journey uses four public routes:
+
+| Route | Purpose |
+| --- | --- |
+| `/vi` | Introduces the family experience and directs visitors to tour, contact, and enquiry details |
+| `/vi/trai-nghiem-pha-tam-giang` | Explains the primary tour, itinerary, inclusions, policies, meeting points, and booking path |
+| `/vi/dat-trai-nghiem` | Hosts the dedicated `Booking enquiry` form and its receipt, failure, and retry states |
+| `/vi/lien-he` | Provides approved phone, Zalo, meeting-point, and Google Maps actions |
+
+The root route `/` redirects to `/vi`.
+
+## Architecture
+
+The main V1 responsibilities live in these paths:
+
+| Responsibility | Repository path |
+| --- | --- |
+| Canonical tour and business facts | `src/content/v1-tour.ts` |
+| Vietnamese tour identity and localized page content | `src/content/v1-tour-vi.ts`, `src/content/landing-page-content.ts` |
+| Vietnamese booking form copy | `src/booking-enquiries/vietnamese-booking-enquiry-copy.ts` |
+| Public route composition | `app/vi/` |
+| Booking enquiry validation, persistence, retries, and form behavior | `src/booking-enquiries/` |
+| Booking enquiry API boundary | `app/api/booking-enquiries/route.ts` |
+| Analytics contract, first-touch attribution, consent, and PostHog runtime | `src/analytics/`, `components/analytics-consent-banner.tsx` |
+| Supabase schema and forward-only migrations | `supabase/migrations/` |
+| Telegram notification delivery and recovery | `src/booking-enquiries/operator-notification.ts`, `src/booking-enquiries/telegram-notification-channel.ts`, `scripts/retry-telegram-notification.ts` |
+| Shared public header, footer, maps, and layout primitives | `components/site/` |
+| Landing-page sections, motion, and water treatments | `components/landing/` |
+
+## Content and booking contracts
+
+Treat `src/content/v1-tour.ts` as the canonical source for approved business facts. Pricing, duration, itinerary, contact information, meeting points, cancellation policy, and weather policy must come from that contract. Do not duplicate these values in route components or localized prose.
+
+A `Booking enquiry` is not a `Confirmed booking`. Durable storage records a request for manual family review. Only the family's direct follow-up and acceptance confirm the trip.
+
+## Intentionally unresolved business rules
+
+Do not infer or publish rules that the business has not approved:
+
+- Child pricing, minimum ages, and child participation rules
+- Detailed swimming, age, and suitability requirements for stand-up paddleboarding (SUP)
+- Pregnancy, elderly, mobility, and medical suitability
+- Detailed safety promises and other unapproved exclusions
+
+## Development guardrails
+
+- Do not fabricate reviews, ratings, reviewer identities, or social-proof counts
+- Do not invent operational claims, guarantees, policies, or response times
+- Preserve `/vi/dat-trai-nghiem` as the dedicated booking route
+- Keep PostHog initialization and attribution gated by affirmative analytics consent
+- Use forward-only Supabase migrations and preserve production data unless a reviewed migration says otherwise
+- Keep service-role keys, bot credentials, and other server secrets out of client code, logs, and commits
 
 ## Local setup
 
@@ -39,11 +96,11 @@ Copy `.env.example` to `.env.local`. Never commit `.env.local` or real credentia
 Migrations live in `supabase/migrations/` and are forward-only. Apply all unapplied migrations to the linked production project with the team's Supabase CLI/deployment workflow, for example:
 
 ```bash
-supabase link --project-ref <production-project-ref>
+supabase link --project-ref your_production_project_ref
 supabase db push
 ```
 
-The pre-launch migrations:
+The V1 production migrations:
 
 - enforce `total_guest_count >= 2` for new writes without rewriting historical rows;
 - install a daily `pg_cron` job that deletes enquiries older than 12 months;
@@ -79,7 +136,7 @@ Configure the bot token and monitored chat ID, then perform a production-like en
 To retry a recorded `failed` Telegram delivery from existing state:
 
 ```bash
-pnpm notifications:retry:telegram -- <booking-enquiry-uuid>
+pnpm notifications:retry:telegram -- booking_enquiry_uuid
 ```
 
 The command loads `.env.local` when present and prints a clear outcome:
